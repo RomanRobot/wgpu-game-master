@@ -66,7 +66,7 @@ struct Adapter:
         required_features: List[FeatureName] = List[FeatureName](),
         limits: Limits = Limits(),
         default_queue: QueueDescriptor = QueueDescriptor(),
-    ) -> Device:
+    ) raises -> Device:
         """
         TODO
         """
@@ -103,6 +103,8 @@ struct Adapter:
         debug_assert(user_data[1], "Expected device callback to be done")
 
         _ = user_data^
+        if not device:
+            raise Error("failed to get device.")
         return Device(device)
 
 
@@ -1010,7 +1012,9 @@ struct Device:
             ),
         )
 
-    fn create_wgsl_shader_module(self, code: StringSlice) -> ShaderModule:
+    fn create_wgsl_shader_module(
+        self, code: StringSlice
+    ) raises -> ShaderModule:
         """
         TODO
         """
@@ -1028,6 +1032,8 @@ struct Device:
             ),
         )
         _ = wgsl_shader^
+        if not handle:
+            raise Error("failed to create shader module.")
         return handle
 
     fn create_texture(self, descriptor: TextureDescriptor) -> Texture:
@@ -1116,8 +1122,10 @@ struct Device:
 struct Instance:
     var _handle: _c.WGPUInstance
 
-    fn __init__(inout self):
+    fn __init__(inout self) raises:
         self._handle = _c.create_instance()
+        if not self._handle:
+            raise Error("failed to create instance.")
 
     fn __moveinit__(inout self, owned rhs: Self):
         self._handle = rhs._handle
@@ -1129,11 +1137,14 @@ struct Instance:
 
     fn create_surface(
         self, window: glfw.Window
-    ) -> Surface[__lifetime_of(window)]:
+    ) raises -> Surface[__lifetime_of(window)]:
         """
         TODO
         """
-        return _glfw_get_wgpu_surface(self._handle, window)
+        surface = _glfw_get_wgpu_surface(self._handle, window)
+        if not surface:
+            raise Error("failed to get surface.")
+        return surface
 
     fn has_wgsl_language_feature(self, feature: WgslFeatureName) -> Bool:
         """
@@ -1163,8 +1174,10 @@ struct Instance:
         self,
         power_preference: PowerPreference = PowerPreference.undefined,
         force_fallback_adapter: Bool = False,
-    ) -> Adapter:
+    ) raises -> Adapter:
         adapter = _request_adapter_sync(self._handle)
+        if not adapter:
+            raise Error("failed to get adapter.")
         return Adapter(adapter)
 
 

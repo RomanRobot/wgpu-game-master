@@ -10,25 +10,13 @@ def main():
     window = glfw.Window(640, 480, "Hello, WebGPU")
 
     instance = wgpu.Instance()
-    if not instance._handle:
-        raise Error("failed to get instance")
-
     surface = instance.create_surface(window)
-    if not surface._handle:
-        raise Error("failed to get surface")
 
     adapter = instance.request_adapter_sync()
 
-    if not adapter._handle:
-        raise Error("failed to get adapter")
-
     device = adapter.adapter_request_device()
-    if not device._handle:
-        raise Error("failed to get device")
 
     queue = device.get_queue()
-    if not queue._handle:
-        raise Error("failed to get queue")
 
     surface_capabilies = surface.get_capabilities(adapter)
     surface_format = surface_capabilies.formats()[0]
@@ -63,9 +51,6 @@ def main():
         """
 
     shader_module = device.create_wgsl_shader_module(code=shader_code)
-
-    if not shader_module._handle:
-        raise Error("failed to create shader module")
 
     targets = List[wgpu.ColorTargetState](
         wgpu.ColorTargetState(
@@ -123,9 +108,6 @@ def main():
             depth_stencil=None,
         )
     )
-
-    if not pipeline._handle:
-        raise Error("failed to get render pipeline")
 
     while not window.should_close():
         glfw.poll_events()
