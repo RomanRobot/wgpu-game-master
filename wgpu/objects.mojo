@@ -36,13 +36,11 @@ struct Adapter:
     #         fn (WGPUAdapter, UnsafePointer[WGPUSupportedLimits]) -> Bool
     #     ]("wgpuAdapterGetLimits")(handle, UnsafePointer.address_of(limits))
 
-    # fn adapter_has_feature(handle: WGPUAdapter, feature: FeatureName) -> Bool:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[fn (WGPUAdapter, FeatureName) -> Bool](
-    #         "wgpuAdapterHasFeature"
-    #     )(handle, feature)
+    fn has_feature(self, feature: FeatureName) -> Bool:
+        """
+        TODO
+        """
+        return _c.adapter_has_feature(self._handle, feature)
 
     # fn adapter_enumerate_features(
     #     handle: WGPUAdapter, features: FeatureName
@@ -108,52 +106,47 @@ struct Adapter:
         return Device(device)
 
 
-# struct _BindGroupImpl:
-#     pass
+struct BindGroup:
+    var _handle: _c.WGPUBindGroup
+
+    fn __init__(inout self, unsafe_ptr: _c.WGPUBindGroup):
+        self._handle = unsafe_ptr
+
+    fn __moveinit__(inout self, owned rhs: Self):
+        self._handle = rhs._handle
+        rhs._handle = _c.WGPUBindGroup()
+
+    fn __del__(owned self):
+        if self._handle:
+            _c.bind_group_release(self._handle)
+
+    fn set_label(self, label: StringSlice):
+        _c.bind_group_set_label(
+            self._handle, label.unsafe_ptr().bitcast[Int8]()
+        )
 
 
-# alias WGPUBindGroup = UnsafePointer[_BindGroupImpl]
+struct BindGroupLayout:
+    var _handle: _c.WGPUBindGroupLayout
 
+    fn __init__(inout self, unsafe_ptr: _c.WGPUBindGroupLayout):
+        self._handle = unsafe_ptr
 
-# fn bind_group_release(handle: WGPUBindGroup):
-#     _wgpu.get_function[fn (UnsafePointer[_BindGroupImpl]) -> None](
-#         "wgpuBindGroupRelease"
-#     )(handle)
+    fn __moveinit__(inout self, owned rhs: Self):
+        self._handle = rhs._handle
+        rhs._handle = _c.WGPUBindGroupLayout()
 
+    fn __del__(owned self):
+        if self._handle:
+            _c.bind_group_layout_release(self._handle)
 
-# fn bind_group_set_label(
-#     handle: WGPUBindGroup, label: UnsafePointer[Int8]
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUBindGroup, UnsafePointer[Int8]) -> None](
-#         "wgpuBindGroupSetLabel"
-#     )(handle, label)
-
-
-# struct _BindGroupLayoutImpl:
-#     pass
-
-
-# alias WGPUBindGroupLayout = UnsafePointer[_BindGroupLayoutImpl]
-
-
-# fn bind_group_layout_release(handle: WGPUBindGroupLayout):
-#     _wgpu.get_function[fn (UnsafePointer[_BindGroupLayoutImpl]) -> None](
-#         "wgpuBindGroupLayoutRelease"
-#     )(handle)
-
-
-# fn bind_group_layout_set_label(
-#     handle: WGPUBindGroupLayout, label: UnsafePointer[Int8]
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[
-#         fn (WGPUBindGroupLayout, UnsafePointer[Int8]) -> None
-#     ]("wgpuBindGroupLayoutSetLabel")(handle, label)
+    fn set_label(self, label: StringSlice):
+        """
+        TODO
+        """
+        _c.bind_group_layout_set_label(
+            self._handle, label.unsafe_ptr().bitcast[Int8]()
+        )
 
 
 struct Buffer:
@@ -170,128 +163,83 @@ struct Buffer:
         if self._handle:
             _c.buffer_release(self._handle)
 
+    # fn buffer_map_async(
+    #     handle: WGPUBuffer,
+    #     mode: MapMode,
+    #     offset: UInt,
+    #     size: UInt,
+    #     callback: fn (BufferMapAsyncStatus, UnsafePointer[NoneType]) -> None,
+    #     user_data: UnsafePointer[NoneType],
+    # ) -> None:
+    #     """
+    #     TODO
+    #     """
+    #     return _wgpu.get_function[
+    #         fn (
+    #             WGPUBuffer,
+    #             MapMode,
+    #             UInt,
+    #             UInt,
+    #             fn (BufferMapAsyncStatus, UnsafePointer[NoneType]) -> None,
+    #             UnsafePointer[NoneType],
+    #         ) -> None
+    #     ]("wgpuBufferMapAsync")(handle, mode, offset, size, callback, user_data)
 
-# fn buffer_release(handle: WGPUBuffer):
-#     _wgpu.get_function[fn (UnsafePointer[_BufferImpl]) -> None](
-#         "wgpuBufferRelease"
-#     )(handle)
+    # fn buffer_get_mapped_range(
+    #     handle: WGPUBuffer, offset: UInt, size: UInt
+    # ) -> UnsafePointer[NoneType]:
+    #     """
+    #     TODO
+    #     """
+    #     return _wgpu.get_function[
+    #         fn (WGPUBuffer, UInt, UInt) -> UnsafePointer[NoneType]
+    #     ]("wgpuBufferGetMappedRange")(handle, offset, size)
 
+    # fn buffer_get_const_mapped_range(
+    #     handle: WGPUBuffer, offset: UInt, size: UInt
+    # ) -> UnsafePointer[NoneType]:
+    #     """
+    #     TODO
+    #     """
+    #     return _wgpu.get_function[
+    #         fn (WGPUBuffer, UInt, UInt) -> UnsafePointer[NoneType]
+    #     ]("wgpuBufferGetConstMappedRange")(handle, offset, size)
 
-# fn buffer_map_async(
-#     handle: WGPUBuffer,
-#     mode: MapMode,
-#     offset: UInt,
-#     size: UInt,
-#     callback: fn (BufferMapAsyncStatus, UnsafePointer[NoneType]) -> None,
-#     user_data: UnsafePointer[NoneType],
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[
-#         fn (
-#             WGPUBuffer,
-#             MapMode,
-#             UInt,
-#             UInt,
-#             fn (BufferMapAsyncStatus, UnsafePointer[NoneType]) -> None,
-#             UnsafePointer[NoneType],
-#         ) -> None
-#     ]("wgpuBufferMapAsync")(handle, mode, offset, size, callback, user_data)
+    fn set_label(self, label: StringSlice):
+        """
+        TODO
+        """
+        _c.buffer_set_label(self._handle, label.unsafe_ptr().bitcast[Int8]())
 
+    fn get_usage(self) -> BufferUsage:
+        """
+        TODO
+        """
+        return _c.buffer_get_usage(self._handle)
 
-# fn buffer_get_mapped_range(
-#     handle: WGPUBuffer, offset: UInt, size: UInt
-# ) -> UnsafePointer[NoneType]:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[
-#         fn (WGPUBuffer, UInt, UInt) -> UnsafePointer[NoneType]
-#     ]("wgpuBufferGetMappedRange")(handle, offset, size)
+    fn get_size(self) -> UInt64:
+        """
+        TODO
+        """
+        return _c.buffer_get_size(self._handle)
 
+    fn get_map_state(self) -> BufferMapState:
+        """
+        TODO
+        """
+        return _c.buffer_get_map_state(self._handle)
 
-# fn buffer_get_const_mapped_range(
-#     handle: WGPUBuffer, offset: UInt, size: UInt
-# ) -> UnsafePointer[NoneType]:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[
-#         fn (WGPUBuffer, UInt, UInt) -> UnsafePointer[NoneType]
-#     ]("wgpuBufferGetConstMappedRange")(handle, offset, size)
+    fn unmap(self):
+        """
+        TODO
+        """
+        _c.buffer_unmap(self._handle)
 
-
-# fn buffer_set_label(handle: WGPUBuffer, label: UnsafePointer[Int8]) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUBuffer, UnsafePointer[Int8]) -> None](
-#         "wgpuBufferSetLabel"
-#     )(handle, label)
-
-
-# fn buffer_get_usage(
-#     handle: WGPUBuffer,
-# ) -> BufferUsage:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUBuffer,) -> BufferUsage](
-#         "wgpuBufferGetUsage"
-#     )(
-#         handle,
-#     )
-
-
-# fn buffer_get_size(
-#     handle: WGPUBuffer,
-# ) -> UInt64:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUBuffer,) -> UInt64]("wgpuBufferGetSize")(
-#         handle,
-#     )
-
-
-# fn buffer_get_map_state(
-#     handle: WGPUBuffer,
-# ) -> BufferMapState:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUBuffer,) -> BufferMapState](
-#         "wgpuBufferGetMapState"
-#     )(
-#         handle,
-#     )
-
-
-# fn buffer_unmap(
-#     handle: WGPUBuffer,
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUBuffer,) -> None]("wgpuBufferUnmap")(
-#         handle,
-#     )
-
-
-# fn buffer_destroy(
-#     handle: WGPUBuffer,
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUBuffer,) -> None]("wgpuBufferDestroy")(
-#         handle,
-#     )
-
-
-# struct _CommandBufferImpl:
-#     pass
+    fn destroy(self):
+        """
+        TODO
+        """
+        _c.buffer_destroy(self._handle)
 
 
 struct CommandBuffer:
@@ -308,16 +256,13 @@ struct CommandBuffer:
         if self._handle:
             _c.command_buffer_release(self._handle)
 
-
-# fn command_buffer_set_label(
-#     handle: WGPUCommandBuffer, label: UnsafePointer[Int8]
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[
-#         fn (WGPUCommandBuffer, UnsafePointer[Int8]) -> None
-#     ]("wgpuCommandBufferSetLabel")(handle, label)
+    fn set_label(self, label: StringSlice):
+        """
+        TODO
+        """
+        _c.command_buffer_set_label(
+            self._handle, label.unsafe_ptr().bitcast[Int8]()
+        )
 
 
 struct CommandEncoder:
@@ -400,25 +345,25 @@ struct CommandEncoder:
         _ = attachments
         return handle
 
-
-# fn command_encoder_copy_buffer_to_buffer(
-#     handle: WGPUCommandEncoder,
-#     source: WGPUBuffer,
-#     source_offset: UInt64,
-#     destination: WGPUBuffer,
-#     destination_offset: UInt64,
-#     size: UInt64,
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[
-#         fn (
-#             WGPUCommandEncoder, WGPUBuffer, UInt64, WGPUBuffer, UInt64, UInt64
-#         ) -> None
-#     ]("wgpuCommandEncoderCopyBufferToBuffer")(
-#         handle, source, source_offset, destination, destination_offset, size
-#     )
+    fn copy_buffer_to_buffer(
+        self,
+        source: Buffer,
+        source_offset: UInt64,
+        destination: Buffer,
+        destination_offset: UInt64,
+        size: UInt64,
+    ):
+        """
+        TODO
+        """
+        _c.command_encoder_copy_buffer_to_buffer(
+            self._handle,
+            source._handle,
+            source_offset,
+            destination._handle,
+            destination_offset,
+            size,
+        )
 
 
 # fn command_encoder_copy_buffer_to_texture(
@@ -772,22 +717,66 @@ struct Device:
         if self._handle:
             _c.device_release(self._handle)
 
-    # fn device_create_bind_group(
-    #     handle: WGPUDevice, descriptor: WGPUBindGroupDescriptor
-    # ) -> WGPUBindGroup:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[
-    #         fn (WGPUDevice, UnsafePointer[WGPUBindGroupDescriptor]) -> WGPUBindGroup
-    #     ]("wgpuDeviceCreateBindGroup")(handle, UnsafePointer.address_of(descriptor))
+    fn create_bind_group(self, descriptor: BindGroupDescriptor) -> BindGroup:
+        """
+        TODO
+        """
+        entries = List[_c.WGPUBindGroupEntry]()
+        for entry in descriptor.entries:
+            entries.append(
+                _c.WGPUBindGroupEntry(
+                    binding=entry[].binding,
+                    buffer=entry[].buffer[]._handle,
+                    offset=entry[].offset,
+                    size=entry[].size,
+                    sampler=entry[].sampler[]._handle,
+                    texture_view=entry[].texture_view[]._handle,
+                )
+            )
+        handle = _c.device_create_bind_group(
+            self._handle,
+            _c.WGPUBindGroupDescriptor(
+                label=descriptor.label.unsafe_cstr_ptr(),
+                layout=descriptor.layout._handle,
+                entrie_count=len(descriptor.entries),
+                entries=entries.unsafe_ptr(),
+            ),
+        )
+        _ = entries
+        return handle
 
-    # fn device_create_bind_group_layout(
-    #     handle: WGPUDevice, descriptor: WGPUBindGroupLayoutDescriptor
-    # ) -> WGPUBindGroupLayout:
-    #     """
-    #     TODO
-    #     """
+    fn create_bind_group_layout(
+        self, descriptor: BindGroupLayoutDescriptor
+    ) -> BindGroupLayout:
+        """
+        TODO
+        """
+        entries = List[_c.WGPUBindGroupLayoutEntry]()
+        # for entry in descriptor.entries:
+        #     entries.append(
+        #         # _c.WGPUBindGroupLayoutEntry(
+        #         #     binding=entry[].binding,
+        #         #     visibility=entry[].visibility,
+        #         #     buffer=_c.WGPUBufferBindingLayout(
+        #         #         # type: BufferBindingType
+        #         #         # has_dynamic_offset: Bool
+        #         #         # min_binding_size: UInt64
+        #         #         type=entry[].buffer.type,),
+        #         #     # var buffer= WGPUBufferBindingLayout
+        #         #     # var sampler= WGPUSamplerBindingLayout
+        #         #     # var texture= WGPUTextureBindingLayout
+        #         #     # var storage_texture= WGPUStorageTextureBindingLayout
+        #         # )
+        #     )
+        return _c.device_create_bind_group_layout(
+            self._handle,
+            _c.WGPUBindGroupLayoutDescriptor(
+                label=descriptor.label.unsafe_cstr_ptr(),
+                entrie_count=len(descriptor.entries),
+                entries=UnsafePointer[_c.WGPUBindGroupLayoutEntry](),
+            ),
+        )
+
     #     return _wgpu.get_function[
     #         fn (
     #             WGPUDevice, UnsafePointer[WGPUBindGroupLayoutDescriptor]
@@ -796,15 +785,19 @@ struct Device:
     #         handle, UnsafePointer.address_of(descriptor)
     #     )
 
-    # fn device_create_buffer(
-    #     handle: WGPUDevice, descriptor: WGPUBufferDescriptor
-    # ) -> WGPUBuffer:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[
-    #         fn (WGPUDevice, UnsafePointer[WGPUBufferDescriptor]) -> WGPUBuffer
-    #     ]("wgpuDeviceCreateBuffer")(handle, UnsafePointer.address_of(descriptor))
+    fn create_buffer(self, descriptor: BufferDescriptor) -> Buffer:
+        """
+        TODO
+        """
+        return _c.device_create_buffer(
+            self._handle,
+            _c.WGPUBufferDescriptor(
+                label=descriptor.label.unsafe_cstr_ptr(),
+                usage=descriptor.usage,
+                size=descriptor.size,
+                mapped_at_creation=descriptor.mapped_at_creation,
+            ),
+        )
 
     fn create_command_encoder(
         self, label: StringLiteral = ""
@@ -870,15 +863,18 @@ struct Device:
             _c.WGPUPipelineLayoutDescriptor(label=label.unsafe_cstr_ptr()),
         )
 
-    # fn device_create_query_set(
-    #     handle: WGPUDevice, descriptor: WGPUQuerySetDescriptor
-    # ) -> WGPUQuerySet:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[
-    #         fn (WGPUDevice, UnsafePointer[WGPUQuerySetDescriptor]) -> WGPUQuerySet
-    #     ]("wgpuDeviceCreateQuerySet")(handle, UnsafePointer.address_of(descriptor))
+    fn create_query_set(self, descriptor: QuerySetDescriptor) -> QuerySet:
+        """
+        TODO
+        """
+        return _c.device_create_query_set(
+            self._handle,
+            _c.WGPUQuerySetDescriptor(
+                label=descriptor.label.unsafe_cstr_ptr(),
+                type=descriptor.type,
+                count=descriptor.count,
+            ),
+        )
 
     # fn device_create_render_pipeline_async(
     #     handle: WGPUDevice,
@@ -993,16 +989,26 @@ struct Device:
         _ = targets^
         return handle
 
-    # fn device_create_sampler(
-    #     handle: WGPUDevice,
-    #     descriptor: WGPUSamplerDescriptor = WGPUSamplerDescriptor(),
-    # ) -> WGPUSampler:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[
-    #         fn (WGPUDevice, UnsafePointer[WGPUSamplerDescriptor]) -> WGPUSampler
-    #     ]("wgpuDeviceCreateSampler")(handle, UnsafePointer.address_of(descriptor))
+    fn create_sampler(self, descriptor: SamplerDescriptor) -> Sampler:
+        """
+        TODO
+        """
+        return _c.device_create_sampler(
+            self._handle,
+            _c.WGPUSamplerDescriptor(
+                label=descriptor.label.unsafe_cstr_ptr(),
+                address_mode_u=descriptor.address_mode_u,
+                address_mode_v=descriptor.address_mode_v,
+                address_mode_w=descriptor.address_mode_w,
+                mag_filter=descriptor.mag_filter,
+                min_filter=descriptor.min_filter,
+                mipmap_filter=descriptor.mipmap_filter,
+                lod_min_clamp=descriptor.lod_min_clamp,
+                lod_max_clamp=descriptor.lod_max_clamp,
+                compare=descriptor.compare,
+                max_anisotropy=descriptor.max_anisotropy,
+            ),
+        )
 
     fn create_wgsl_shader_module(self, code: StringSlice) -> ShaderModule:
         """
@@ -1024,25 +1030,30 @@ struct Device:
         _ = wgsl_shader^
         return handle
 
-    # fn device_create_texture(
-    #     handle: WGPUDevice, descriptor: WGPUTextureDescriptor
-    # ) -> WGPUTexture:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[
-    #         fn (WGPUDevice, UnsafePointer[WGPUTextureDescriptor]) -> WGPUTexture
-    #     ]("wgpuDeviceCreateTexture")(handle, UnsafePointer.address_of(descriptor))
+    fn create_texture(self, descriptor: TextureDescriptor) -> Texture:
+        """
+        TODO
+        """
+        return _c.device_create_texture(
+            self._handle,
+            _c.WGPUTextureDescriptor(
+                label=descriptor.label.unsafe_cstr_ptr(),
+                usage=descriptor.usage,
+                dimension=descriptor.dimension,
+                size=descriptor.size,
+                format=descriptor.format,
+                mip_level_count=descriptor.mip_level_count,
+                sample_count=descriptor.sample_count,
+                view_format_count=len(descriptor.view_formats),
+                view_formats=descriptor.view_formats.unsafe_ptr(),
+            ),
+        )
 
-    # fn device_destroy(
-    #     handle: WGPUDevice,
-    # ) -> None:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[fn (WGPUDevice,) -> None]("wgpuDeviceDestroy")(
-    #         handle,
-    #     )
+    fn destroy(self):
+        """
+        TODO
+        """
+        _c.device_destroy(self._handle)
 
     # fn device_get_limits(handle: WGPUDevice, limits: WGPUSupportedLimits) -> Bool:
     #     """
@@ -1052,21 +1063,17 @@ struct Device:
     #         fn (WGPUDevice, UnsafePointer[WGPUSupportedLimits]) -> Bool
     #     ]("wgpuDeviceGetLimits")(handle, UnsafePointer.address_of(limits))
 
-    # fn device_has_feature(handle: WGPUDevice, feature: FeatureName) -> Bool:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[fn (WGPUDevice, FeatureName) -> Bool](
-    #         "wgpuDeviceHasFeature"
-    #     )(handle, feature)
+    fn has_feature(self, feature: FeatureName) -> Bool:
+        """
+        TODO
+        """
+        return _c.device_has_feature(self._handle, feature)
 
-    # fn device_enumerate_features(handle: WGPUDevice, features: FeatureName) -> UInt:
-    #     """
-    #     TODO
-    #     """
-    #     return _wgpu.get_function[fn (WGPUDevice, FeatureName) -> UInt](
-    #         "wgpuDeviceEnumerateFeatures"
-    #     )(handle, features)
+    fn enumerate_features(self, features: FeatureName) -> UInt:
+        """
+        TODO
+        """
+        return _c.device_enumerate_features(self._handle, features)
 
     fn get_queue(self) -> Queue:
         """
@@ -1943,22 +1950,25 @@ struct RenderPipeline:
 #     pass
 
 
-# alias WGPUSampler = UnsafePointer[_SamplerImpl]
+struct Sampler:
+    var _handle: _c.WGPUSampler
 
+    fn __init__(inout self, unsafe_ptr: _c.WGPUSampler):
+        self._handle = unsafe_ptr
 
-# fn sampler_release(handle: WGPUSampler):
-#     _wgpu.get_function[fn (UnsafePointer[_SamplerImpl]) -> None](
-#         "wgpuSamplerRelease"
-#     )(handle)
+    fn __moveinit__(inout self, owned rhs: Self):
+        self._handle = rhs._handle
+        rhs._handle = _c.WGPUSampler()
 
+    fn __del__(owned self):
+        if self._handle:
+            _c.sampler_release(self._handle)
 
-# fn sampler_set_label(handle: WGPUSampler, label: UnsafePointer[Int8]) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[fn (WGPUSampler, UnsafePointer[Int8]) -> None](
-#         "wgpuSamplerSetLabel"
-#     )(handle, label)
+    fn set_label(self, label: StringSlice):
+        """
+        TODO
+        """
+        _c.sampler_set_label(self._handle, label.unsafe_ptr().bitcast[Int8]())
 
 
 struct ShaderModule:
