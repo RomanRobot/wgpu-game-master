@@ -1,10 +1,11 @@
 from sys import ffi
-from utils import Span
+from memory import Span, UnsafePointer
 from .enums import *
 from .bitflags import *
 from .constants import *
 
 var _wgpu = ffi.DLHandle("libwgpu_native.dylib", ffi.RTLD.LAZY)
+from memory import UnsafePointer
 
 
 @value
@@ -13,7 +14,7 @@ struct ChainedStruct:
     var s_type: SType
 
     fn __init__(
-        inout self,
+        out self,
         next: UnsafePointer[Self] = UnsafePointer[Self](),
         s_type: SType = SType.invalid,
     ):
@@ -27,7 +28,7 @@ struct ChainedStructOut:
     var s_type: SType
 
     fn __init__(
-        inout self,
+        out self,
         next: UnsafePointer[Self] = UnsafePointer[Self](),
         s_type: SType = SType.invalid,
     ):
@@ -128,7 +129,7 @@ fn adapter_request_device(
     TODO
     """
     return _wgpuAdapterRequestDevice(
-        handle, UnsafePointer.address_of(descriptor), callback, user_data
+        handle, UnsafePointer[WGPUDeviceDescriptor](), callback, user_data
     )
 
 
@@ -1348,7 +1349,7 @@ fn instance_request_adapter(
     TODO
     """
     return _wgpuInstanceRequestAdapter(
-        handle, UnsafePointer[WGPURequestAdapterOptions](), callback, user_data
+        handle, UnsafePointer.address_of(options), callback, user_data
     )
 
 
@@ -2682,7 +2683,7 @@ struct WGPURequestAdapterOptions:
     var force_fallback_adapter: Bool
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -2715,7 +2716,7 @@ struct WGPUAdapterInfo:
     var device_ID: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStructOut] = UnsafePointer[
             ChainedStructOut
         ](),
@@ -2756,7 +2757,7 @@ struct WGPUDeviceDescriptor:
     var uncaptured_error_callback_info: UnsafePointer[NoneType]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -2805,7 +2806,7 @@ struct WGPUBindGroupEntry:
     var texture_view: WGPUTextureView
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -2838,7 +2839,7 @@ struct WGPUBindGroupDescriptor:
     var entries: UnsafePointer[WGPUBindGroupEntry]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -2868,7 +2869,7 @@ struct WGPUBufferBindingLayout:
     var min_binding_size: UInt64
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -2892,7 +2893,7 @@ struct WGPUSamplerBindingLayout:
     var type: SamplerBindingType
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -2914,7 +2915,7 @@ struct WGPUTextureBindingLayout:
     var multisampled: Bool
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -2944,7 +2945,7 @@ struct WGPUSurfaceCapabilities:
     var alpha_modes: UnsafePointer[CompositeAlphaMode]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStructOut] = UnsafePointer[
             ChainedStructOut
         ](),
@@ -2988,7 +2989,7 @@ struct WGPUSurfaceConfiguration:
     var present_mode: PresentMode
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3028,7 +3029,7 @@ struct WGPUStorageTextureBindingLayout:
     var view_dimension: TextureViewDimension
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3057,7 +3058,7 @@ struct WGPUBindGroupLayoutEntry:
     var storage_texture: WGPUStorageTextureBindingLayout
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3089,7 +3090,7 @@ struct WGPUBindGroupLayoutDescriptor:
     var entries: UnsafePointer[WGPUBindGroupLayoutEntry]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3116,7 +3117,7 @@ struct WGPUBlendComponent:
     var dst_factor: BlendFactor
 
     fn __init__(
-        inout self,
+        out self,
         operation: BlendOperation = BlendOperation(0),
         src_factor: BlendFactor = BlendFactor(0),
         dst_factor: BlendFactor = BlendFactor(0),
@@ -3139,7 +3140,7 @@ struct WGPUBufferDescriptor:
     var mapped_at_creation: Bool
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3167,7 +3168,7 @@ struct WGPUColor:
     var a: Float64
 
     fn __init__(
-        inout self,
+        out self,
         r: Float64 = Float64(),
         g: Float64 = Float64(),
         b: Float64 = Float64(),
@@ -3190,7 +3191,7 @@ struct WGPUConstantEntry:
     var value: Float64
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3212,7 +3213,7 @@ struct WGPUCommandBufferDescriptor:
     var label: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3232,7 +3233,7 @@ struct WGPUCommandEncoderDescriptor:
     var label: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3253,7 +3254,7 @@ struct WGPUCompilationInfo:
     var messages: UnsafePointer[WGPUCompilationMessage]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3285,7 +3286,7 @@ struct WGPUCompilationMessage:
     var utf16_length: UInt64
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3322,7 +3323,7 @@ struct WGPUComputePassDescriptor:
     var timestamp_writes: UnsafePointer[WGPUComputePassTimestampWrites]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3347,7 +3348,7 @@ struct WGPUComputePassTimestampWrites:
     var end_of_pass_write_index: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         query_set: WGPUQuerySet = WGPUQuerySet(),
         beginning_of_pass_write_index: UInt32 = UInt32(),
         end_of_pass_write_index: UInt32 = UInt32(),
@@ -3369,7 +3370,7 @@ struct WGPUComputePipelineDescriptor:
     var compute: WGPUProgrammableStageDescriptor
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3423,7 +3424,7 @@ struct WGPULimits:
     var max_compute_workgroups_per_dimension: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         max_texture_dimension_1D: UInt32 = UInt32(),
         max_texture_dimension_2D: UInt32 = UInt32(),
         max_texture_dimension_3D: UInt32 = UInt32(),
@@ -3529,7 +3530,7 @@ struct WGPURequiredLimits:
     var limits: WGPULimits
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3549,7 +3550,7 @@ struct WGPUSupportedLimits:
     var limits: WGPULimits
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStructOut] = UnsafePointer[
             ChainedStructOut
         ](),
@@ -3570,7 +3571,7 @@ struct WGPUExtent3D:
     var depth_or_array_layers: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         width: UInt32 = UInt32(),
         height: UInt32 = UInt32(),
         depth_or_array_layers: UInt32 = UInt32(),
@@ -3591,7 +3592,7 @@ struct WGPUImageCopyBuffer:
     var buffer: WGPUBuffer
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3616,7 +3617,7 @@ struct WGPUImageCopyTexture:
     var aspect: TextureAspect
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3641,7 +3642,7 @@ struct WGPUInstanceDescriptor:
     var next_in_chain: UnsafePointer[ChainedStruct]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3660,7 +3661,7 @@ struct WGPUVertexAttribute:
     var shader_location: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         format: VertexFormat = VertexFormat(0),
         offset: UInt64 = UInt64(),
         shader_location: UInt32 = UInt32(),
@@ -3682,7 +3683,7 @@ struct WGPUVertexBufferLayout:
     var attributes: UnsafePointer[WGPUVertexAttribute]
 
     fn __init__(
-        inout self,
+        out self,
         array_stride: UInt64 = UInt64(),
         step_mode: VertexStepMode = VertexStepMode(0),
         attribute_count: Int = Int(),
@@ -3707,7 +3708,7 @@ struct WGPUOrigin3D:
     var z: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         x: UInt32 = UInt32(),
         y: UInt32 = UInt32(),
         z: UInt32 = UInt32(),
@@ -3729,7 +3730,7 @@ struct WGPUPipelineLayoutDescriptor:
     var bind_group_layouts: UnsafePointer[WGPUBindGroupLayout]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3758,7 +3759,7 @@ struct WGPUProgrammableStageDescriptor:
     var constants: UnsafePointer[WGPUConstantEntry]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3788,7 +3789,7 @@ struct WGPUQuerySetDescriptor:
     var count: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3812,7 +3813,7 @@ struct WGPUQueueDescriptor:
     var label: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3832,7 +3833,7 @@ struct WGPURenderBundleDescriptor:
     var label: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3858,7 +3859,7 @@ struct WGPURenderBundleEncoderDescriptor:
     var stencil_read_only: Bool
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3897,7 +3898,7 @@ struct WGPURenderPassColorAttachment:
     var clear_value: WGPUColor
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -3906,7 +3907,7 @@ struct WGPURenderPassColorAttachment:
         resolve_target: WGPUTextureView = WGPUTextureView(),
         load_op: LoadOp = LoadOp(0),
         store_op: StoreOp = StoreOp(0),
-        owned clear_value: WGPUColor = WGPUColor(),
+        clear_value: WGPUColor = WGPUColor(),
     ):
         self.next_in_chain = next_in_chain
         self.view = view
@@ -3914,7 +3915,7 @@ struct WGPURenderPassColorAttachment:
         self.resolve_target = resolve_target
         self.load_op = load_op
         self.store_op = store_op
-        self.clear_value = clear_value^
+        self.clear_value = clear_value
 
 
 @value
@@ -3934,7 +3935,7 @@ struct WGPURenderPassDepthStencilAttachment:
     var stencil_read_only: Bool
 
     fn __init__(
-        inout self,
+        out self,
         view: WGPUTextureView = WGPUTextureView(),
         depth_load_op: LoadOp = LoadOp(0),
         depth_store_op: StoreOp = StoreOp(0),
@@ -3973,7 +3974,7 @@ struct WGPURenderPassDescriptor:
     var timestamp_writes: UnsafePointer[WGPURenderPassTimestampWrites]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4009,7 +4010,7 @@ struct WGPURenderPassDescriptorMaxDrawCount:
     var max_draw_count: UInt64
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         max_draw_count: UInt64 = UInt64(),
     ):
@@ -4028,7 +4029,7 @@ struct WGPURenderPassTimestampWrites:
     var end_of_pass_write_index: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         query_set: WGPUQuerySet = WGPUQuerySet(),
         beginning_of_pass_write_index: UInt32 = UInt32(),
         end_of_pass_write_index: UInt32 = UInt32(),
@@ -4053,7 +4054,7 @@ struct WGPUVertexState:
     var buffers: UnsafePointer[WGPUVertexBufferLayout]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4090,7 +4091,7 @@ struct WGPUPrimitiveState:
     var cull_mode: CullMode
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4116,7 +4117,7 @@ struct WGPUPrimitiveDepthClipControl:
     var unclipped_depth: Bool
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         unclipped_depth: Bool = False,
     ):
@@ -4143,7 +4144,7 @@ struct WGPUDepthStencilState:
     var depth_bias_clamp: Float32
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4183,7 +4184,7 @@ struct WGPUMultisampleState:
     var alpha_to_coverage_enabled: Bool
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4212,7 +4213,7 @@ struct WGPUFragmentState:
     var targets: UnsafePointer[WGPUColorTargetState]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4248,7 +4249,7 @@ struct WGPUColorTargetState:
     var write_mask: ColorWriteMask
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4272,7 +4273,7 @@ struct WGPUBlendState:
     var alpha: WGPUBlendComponent
 
     fn __init__(
-        inout self,
+        out self,
         owned color: WGPUBlendComponent = WGPUBlendComponent(),
         owned alpha: WGPUBlendComponent = WGPUBlendComponent(),
     ):
@@ -4296,7 +4297,7 @@ struct WGPURenderPipelineDescriptor:
     var fragment: UnsafePointer[WGPUFragmentState]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4342,7 +4343,7 @@ struct WGPUSamplerDescriptor:
     var max_anisotropy: UInt16
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4384,7 +4385,7 @@ struct WGPUShaderModuleDescriptor:
     var hints: UnsafePointer[WGPUShaderModuleCompilationHint]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4411,7 +4412,7 @@ struct WGPUShaderModuleCompilationHint:
     var layout: WGPUPipelineLayout
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4434,7 +4435,7 @@ struct WGPUShaderModuleSpirvDescriptor:
     var code: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         code_size: UInt32 = UInt32(),
         code: UInt32 = UInt32(),
@@ -4454,7 +4455,7 @@ struct WGPUShaderModuleWgslDescriptor:
     var code: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         code: UnsafePointer[Int8] = UnsafePointer[Int8](),
     ):
@@ -4474,7 +4475,7 @@ struct WGPUStencilFaceState:
     var pass_op: StencilOperation
 
     fn __init__(
-        inout self,
+        out self,
         compare: CompareFunction = CompareFunction(0),
         fail_op: StencilOperation = StencilOperation(0),
         depth_fail_op: StencilOperation = StencilOperation(0),
@@ -4496,7 +4497,7 @@ struct WGPUSurfaceDescriptor:
     var label: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4516,7 +4517,7 @@ struct WGPUSurfaceDescriptorFromAndroidNativeWindow:
     var window: UnsafePointer[NoneType]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         window: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
     ):
@@ -4534,7 +4535,7 @@ struct WGPUSurfaceDescriptorFromCanvasHtmlSelector:
     var selector: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         selector: UnsafePointer[Int8] = UnsafePointer[Int8](),
     ):
@@ -4552,7 +4553,7 @@ struct WGPUSurfaceDescriptorFromMetalLayer:
     var layer: UnsafePointer[NoneType]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         layer: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
     ):
@@ -4571,7 +4572,7 @@ struct WGPUSurfaceDescriptorFromWindowsHwnd:
     var hwnd: UnsafePointer[NoneType]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         hinstance: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
         hwnd: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
@@ -4592,7 +4593,7 @@ struct WGPUSurfaceDescriptorFromXcbWindow:
     var window: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         connection: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
         window: UInt32 = UInt32(),
@@ -4613,7 +4614,7 @@ struct WGPUSurfaceDescriptorFromXlibWindow:
     var window: UInt64
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         display: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
         window: UInt64 = UInt64(),
@@ -4634,7 +4635,7 @@ struct WGPUSurfaceDescriptorFromWaylandSurface:
     var surface: UnsafePointer[NoneType]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         display: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
         surface: UnsafePointer[NoneType] = UnsafePointer[NoneType](),
@@ -4655,7 +4656,7 @@ struct WGPUSurfaceTexture:
     var status: SurfaceGetCurrentTextureStatus
 
     fn __init__(
-        inout self,
+        out self,
         texture: WGPUTexture = WGPUTexture(),
         suboptimal: Bool = False,
         status: SurfaceGetCurrentTextureStatus = SurfaceGetCurrentTextureStatus(
@@ -4679,7 +4680,7 @@ struct WGPUTextureDataLayout:
     var rows_per_image: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4711,7 +4712,7 @@ struct WGPUTextureDescriptor:
     var view_formats: UnsafePointer[TextureFormat]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4756,7 +4757,7 @@ struct WGPUTextureViewDescriptor:
     var aspect: TextureAspect
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4791,7 +4792,7 @@ struct WGPUUncapturedErrorCallbackInfo:
     var userdata: UnsafePointer[NoneType]
 
     fn __init__(
-        inout self,
+        out self,
         next_in_chain: UnsafePointer[ChainedStruct] = UnsafePointer[
             ChainedStruct
         ](),
@@ -4846,7 +4847,7 @@ struct WGPUInstanceExtras:
     var dxc_path: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         backends: InstanceBackend = InstanceBackend.all,
         flags: InstanceFlag = InstanceFlag.default,
@@ -4870,7 +4871,7 @@ struct WGPUDeviceExtras:
     var trace_path: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         trace_path: UnsafePointer[Int8] = UnsafePointer[Int8](),
     ):
@@ -4884,7 +4885,7 @@ struct WGPUNativeLimits:
     var max_non_sampler_bindings: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         max_push_constant_size: UInt32 = 0,
         max_non_sampler_bindings: UInt32 = 0,
     ):
@@ -4898,7 +4899,7 @@ struct WGPURequiredLimitsExtras:
     var limits: WGPUNativeLimits
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         limits: WGPUNativeLimits = WGPUNativeLimits(),
     ):
@@ -4912,7 +4913,7 @@ struct WGPUSupportedLimitsExtras:
     var limits: WGPUNativeLimits
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         limits: WGPUNativeLimits = WGPUNativeLimits(),
     ):
@@ -4927,7 +4928,7 @@ struct WGPUPushConstantRange:
     var end: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         stages: ShaderStage = ShaderStage.none,
         start: UInt32 = 0,
         end: UInt32 = 0,
@@ -4944,7 +4945,7 @@ struct WGPUPipelineLayoutExtras:
     var push_constant_ranges: UnsafePointer[WGPUPushConstantRange]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         push_constant_range_count: Int = 0,
         push_constant_ranges: UnsafePointer[
@@ -4965,7 +4966,7 @@ struct WGPUWrappedSubmissionIndex:
     var submission_index: WGPUSubmissionIndex
 
     fn __init__(
-        inout self,
+        out self,
         queue: WGPUQueue = WGPUQueue(),
         submission_index: WGPUSubmissionIndex = WGPUSubmissionIndex(),
     ):
@@ -4979,7 +4980,7 @@ struct WGPUShaderDefine:
     var value: UnsafePointer[Int8]
 
     fn __init__(
-        inout self,
+        out self,
         name: UnsafePointer[Int8] = UnsafePointer[Int8](),
         value: UnsafePointer[Int8] = UnsafePointer[Int8](),
     ):
@@ -4996,7 +4997,7 @@ struct WGPUShaderModuleGLSLDescriptor:
     var defines: UnsafePointer[WGPUShaderDefine]
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         stage: ShaderStage = ShaderStage.none,
         code: UnsafePointer[Int8] = UnsafePointer[Int8](),
@@ -5021,7 +5022,7 @@ struct WGPURegistryReport:
     var element_size: Int
 
     fn __init__(
-        inout self,
+        out self,
         num_allocated: Int = 0,
         num_kept_from_user: Int = 0,
         num_released_from_user: Int = 0,
@@ -5055,7 +5056,7 @@ struct WGPUHubReport:
     var samplers: WGPURegistryReport
 
     fn __init__(
-        inout self,
+        out self,
         adapters: WGPURegistryReport = WGPURegistryReport(),
         devices: WGPURegistryReport = WGPURegistryReport(),
         queues: WGPURegistryReport = WGPURegistryReport(),
@@ -5101,7 +5102,7 @@ struct WGPUGlobalReport:
     var gl: WGPUHubReport
 
     fn __init__(
-        inout self,
+        out self,
         surfaces: WGPURegistryReport = WGPURegistryReport(),
         backend_type: BackendType = BackendType.undefined,
         vulkan: WGPUHubReport = WGPUHubReport(),
@@ -5123,7 +5124,7 @@ struct WGPUInstanceEnumerateAdapterOptions:
     var backends: InstanceBackend
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         backends: InstanceBackend = InstanceBackend.all,
     ):
@@ -5142,7 +5143,7 @@ struct WGPUBindGroupEntryExtras:
     var texture_view_count: Int
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         buffers: UnsafePointer[WGPUBuffer] = UnsafePointer[WGPUBuffer](),
         buffer_count: Int = 0,
@@ -5168,7 +5169,7 @@ struct WGPUBindGroupLayoutEntryExtras:
     var count: UInt32
 
     fn __init__(
-        inout self, chain: ChainedStruct = ChainedStruct(), count: UInt32 = 0
+        out self, chain: ChainedStruct = ChainedStruct(), count: UInt32 = 0
     ):
         self.chain = chain
         self.count = count
@@ -5181,7 +5182,7 @@ struct WGPUQuerySetDescriptorExtras:
     var pipeline_statistics_count: Int
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         pipeline_statistics: UnsafePointer[
             PipelineStatisticName
@@ -5199,7 +5200,7 @@ struct WGPUSurfaceConfigurationExtras:
     var desired_maximum_frame_latency: UInt32
 
     fn __init__(
-        inout self,
+        out self,
         chain: ChainedStruct = ChainedStruct(),
         desired_maximum_frame_latency: UInt32 = 0,
     ):
@@ -5260,11 +5261,7 @@ fn device_poll(
     ]("wgpuDevicePoll")(
         device,
         wait,
-        UnsafePointer.address_of(
-            wrapped_submission_index.value()
-        ) if wrapped_submission_index else UnsafePointer[
-            WGPUWrappedSubmissionIndex
-        ](),
+        UnsafePointer[WGPUWrappedSubmissionIndex, mut=False](),
     )
 
 

@@ -1,5 +1,6 @@
 from sys import ffi
-from utils import Span, StringSlice
+from collections.string import StringSlice
+from memory import UnsafePointer, Span
 
 var _glfw = ffi.DLHandle("libglfw.dylib", ffi.RTLD.LAZY)
 
@@ -18,6 +19,10 @@ fn get_platform() -> Platform:
 @value
 struct Platform:
     var value: Int32
+
+    @implicit
+    fn __init__(out self, value: Int32):
+        self.value = value
 
     alias win32 = Self(0x00060001)
     alias cocoa = Self(0x00060002)
@@ -60,7 +65,7 @@ struct Window:
     var _handle: UnsafePointer[_GLFWwindow]
     var title: String
 
-    fn __init__(inout self, width: Int32, height: Int32, owned title: String):
+    fn __init__(out self, width: Int32, height: Int32, owned title: String):
         self.title = title
         self._handle = _glfw.get_function[
             fn (

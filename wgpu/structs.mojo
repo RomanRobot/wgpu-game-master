@@ -1,6 +1,7 @@
 from collections import Optional
-from utils import StringSlice, Span, Variant
-from memory import Arc
+from utils import Variant
+from memory import Span, ArcPointer
+from collections.string import StringSlice
 
 from .bitflags import *
 from .constants import *
@@ -21,35 +22,31 @@ alias StencilFaceState = _c.WGPUStencilFaceState
 
 
 @value
-struct RequestAdapterOptions[
-    surface: ImmutableLifetime, window: ImmutableLifetime
-]:
+struct RequestAdapterOptions[surface: ImmutableOrigin, window: ImmutableOrigin]:
     var power_preference: PowerPreference
     var force_fallback_adapter: Bool
-    var compatible_surface: Optional[Reference[Surface[window], surface]]
+    var compatible_surface: Optional[Pointer[Surface[window], surface]]
 
     fn __init__(
-        inout self,
+        out self,
         power_preference: PowerPreference = PowerPreference.undefined,
         force_fallback_adapter: Bool = False,
-        compatible_surface: Optional[
-            Reference[Surface[window], surface]
-        ] = None,
+        compatible_surface: Optional[Pointer[Surface[window], surface]] = None,
     ):
         self.power_preference = power_preference
         self.force_fallback_adapter = force_fallback_adapter
         self.compatible_surface = compatible_surface
 
 
-struct AdapterInfo[lt: ImmutableLifetime]:
+struct AdapterInfo[origin: ImmutableOrigin]:
     """
     TODO
     """
 
-    var vendor: StringSlice[lt]
-    var architecture: StringSlice[lt]
-    var device: StringSlice[lt]
-    var description: StringSlice[lt]
+    var vendor: StringSlice[origin]
+    var architecture: StringSlice[origin]
+    var device: StringSlice[origin]
+    var description: StringSlice[origin]
     var backend_type: BackendType
     var adapter_type: AdapterType
     var vendor_ID: UInt32
@@ -71,7 +68,7 @@ struct DeviceDescriptor:
     # var uncaptured_error_callback_info: UnsafePointer[NoneType]
 
     fn __init__(
-        inout self,
+        out self,
         label: StringLiteral = "",
         required_features: Optional[List[FeatureName]] = None,
         limits: Limits = Limits(),
@@ -90,11 +87,11 @@ struct BindGroupEntry:
     """
 
     var binding: UInt32
-    var buffer: Arc[Buffer]
+    var buffer: ArcPointer[Buffer]
     var offset: UInt64
     var size: UInt64
-    var sampler: Arc[Sampler]
-    var texture_view: Arc[TextureView]
+    var sampler: ArcPointer[Sampler]
+    var texture_view: ArcPointer[TextureView]
 
 
 struct BindGroupDescriptor:
@@ -146,7 +143,7 @@ struct SurfaceCapabilities:
 
     var _handle: _c.WGPUSurfaceCapabilities
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUSurfaceCapabilities):
+    fn __init__(out self, unsafe_ptr: _c.WGPUSurfaceCapabilities):
         self._handle = unsafe_ptr
 
     fn __del__(owned self):
@@ -155,21 +152,21 @@ struct SurfaceCapabilities:
     fn usages(self) -> TextureUsage:
         return self._handle.usages
 
-    fn formats(self) -> Span[TextureFormat, __lifetime_of(self)]:
-        return Span[TextureFormat, __lifetime_of(self)](
-            unsafe_ptr=self._handle.formats, len=self._handle.format_count
+    fn formats(self) -> Span[TextureFormat, __origin_of(self)]:
+        return Span[TextureFormat, __origin_of(self)](
+            ptr=self._handle.formats, length=self._handle.format_count
         )
 
-    fn present_modes(self) -> Span[PresentMode, __lifetime_of(self)]:
-        return Span[PresentMode, __lifetime_of(self)](
-            unsafe_ptr=self._handle.present_modes,
-            len=self._handle.present_mode_count,
+    fn present_modes(self) -> Span[PresentMode, __origin_of(self)]:
+        return Span[PresentMode, __origin_of(self)](
+            ptr=self._handle.present_modes,
+            length=self._handle.present_mode_count,
         )
 
-    fn alpha_modes(self) -> Span[CompositeAlphaMode, __lifetime_of(self)]:
-        return Span[CompositeAlphaMode, __lifetime_of(self)](
-            unsafe_ptr=self._handle.alpha_modes,
-            len=self._handle.alpha_mode_count,
+    fn alpha_modes(self) -> Span[CompositeAlphaMode, __origin_of(self)]:
+        return Span[CompositeAlphaMode, __origin_of(self)](
+            ptr=self._handle.alpha_modes,
+            length=self._handle.alpha_mode_count,
         )
 
 
@@ -188,7 +185,7 @@ struct SurfaceConfiguration:
     var present_mode: PresentMode
 
     fn __init__(
-        inout self,
+        out self,
         format: TextureFormat,
         usage: TextureUsage,
         view_formats: List[TextureFormat],
@@ -323,7 +320,7 @@ struct ComputePassTimestampWrites:
     TODO
     """
 
-    var query_set: Arc[QuerySet]
+    var query_set: ArcPointer[QuerySet]
     var beginning_of_pass_write_index: UInt32
     var end_of_pass_write_index: UInt32
 
@@ -335,61 +332,61 @@ struct ComputePipelineDescriptor:
     """
 
     var label: StringLiteral
-    var layout: Arc[PipelineLayout]
+    var layout: ArcPointer[PipelineLayout]
     var compute: ProgrammableStageDescriptor
 
 
 @value
-struct ImageCopyBuffer[buf: ImmutableLifetime]:
+struct ImageCopyBuffer[buf: ImmutableOrigin]:
     """
     TODO
     """
 
     var layout: TextureDataLayout
-    var buffer: Reference[Buffer, buf]
+    var buffer: Pointer[Buffer, buf]
 
     fn __init__(
-        inout self,
+        out self,
         ref [buf]buffer: Buffer,
         layout: TextureDataLayout = TextureDataLayout(),
     ):
-        self.buffer = buffer
+        self.buffer = Pointer.address_of(buffer)
         self.layout = layout
 
 
 @value
-struct ImageCopyTexture[tex: ImmutableLifetime]:
+struct ImageCopyTexture[tex: ImmutableOrigin]:
     """
     TODO
     """
 
-    var texture: Reference[Texture, tex]
+    var texture: Pointer[Texture, tex]
     var mip_level: UInt32
     var origin: Origin3D
     var aspect: TextureAspect
 
     fn __init__(
-        inout self,
+        out self,
         ref [tex]texture: Texture,
         mip_level: UInt32 = 0,
         origin: Origin3D = Origin3D(),
         aspect: TextureAspect = TextureAspect.all,
     ):
-        self.texture = texture
+        self.texture = Pointer.address_of(texture)
         self.mip_level = mip_level
         self.origin = origin
         self.aspect = aspect
 
 
 @value
-struct VertexBufferLayout[lifetime: ImmutableLifetime]:
+struct VertexBufferLayout[origin: ImmutableOrigin]:
     """
     TODO
     """
 
     var array_stride: UInt64
     var step_mode: VertexStepMode
-    var attributes: Span[VertexAttribute, lifetime]
+    var attributes: Span[VertexAttribute, origin]
 
 
 struct PipelineLayoutDescriptor:
@@ -398,7 +395,7 @@ struct PipelineLayoutDescriptor:
     """
 
     var label: StringLiteral
-    var bind_group_layouts: List[Arc[BindGroupLayout]]
+    var bind_group_layouts: List[ArcPointer[BindGroupLayout]]
 
 
 @value
@@ -407,7 +404,7 @@ struct ProgrammableStageDescriptor:
     TODO
     """
 
-    var module: Arc[ShaderModule]
+    var module: ArcPointer[ShaderModule]
     var entry_point: StringLiteral
     var constants: List[ConstantEntry]
 
@@ -431,7 +428,7 @@ struct QueueDescriptor:
 
     var label: String
 
-    fn __init__(inout self, label: String = String()):
+    fn __init__(out self, label: String = String()):
         self.label = label
 
 
@@ -464,20 +461,20 @@ struct RenderPassColorAttachment:
     TODO
     """
 
-    var view: Arc[TextureView]
+    var view: ArcPointer[TextureView]
     var depth_slice: UInt32
-    var resolve_target: Optional[Arc[TextureView]]
+    var resolve_target: Optional[ArcPointer[TextureView]]
     var load_op: LoadOp
     var store_op: StoreOp
     var clear_value: Color
 
     fn __init__(
-        inout self,
-        view: Arc[TextureView],
+        out self,
+        view: ArcPointer[TextureView],
         load_op: LoadOp,
         store_op: StoreOp,
         *,
-        resolve_target: Optional[Arc[TextureView]] = None,
+        resolve_target: Optional[ArcPointer[TextureView]] = None,
         clear_value: Color = Color(),
         depth_slice: UInt32 = DEPTH_SLICE_UNDEFINED,
     ):
@@ -495,7 +492,7 @@ struct RenderPassDepthStencilAttachment:
     TODO
     """
 
-    var view: Arc[TextureView]
+    var view: ArcPointer[TextureView]
     var depth_load_op: LoadOp
     var depth_store_op: StoreOp
     var depth_clear_value: Float32
@@ -533,50 +530,39 @@ struct RenderPassTimestampWrites:
     TODO
     """
 
-    var query_set: Arc[QuerySet]
+    var query_set: ArcPointer[QuerySet]
     var beginning_of_pass_write_index: UInt32
     var end_of_pass_write_index: UInt32
 
 
+@value
 struct VertexState[
-    mod: ImmutableLifetime, entry: ImmutableLifetime, buf: ImmutableLifetime
+    mod: ImmutableOrigin,
+    entry: ImmutableOrigin,
+    buf: ImmutableOrigin,
+    vbuf: ImmutableOrigin,
 ]:
     """
     TODO
     """
 
-    var module: Reference[ShaderModule, mod]
+    var module: Pointer[ShaderModule, mod]
     var entry_point: StringSlice[entry]
     # var constants: Span[ConstantEntry, lifetime]
-    var buffers: Span[VertexBufferLayout[buf], buf]
+    var buffers: Span[VertexBufferLayout[vbuf], buf]
 
     fn __init__(
-        inout self,
+        out self,
         ref [mod]module: ShaderModule,
         entry_point: StringSlice[entry],
-        buffers: Span[VertexBufferLayout[buf], buf],
+        buffers: Span[VertexBufferLayout[vbuf], buf],
     ):
-        self.module = module
-        self.entry_point = StringSlice(
-            unsafe_from_utf8=entry_point.as_bytes_slice()
-        )
+        self.module = Pointer.address_of(module)
+        self.entry_point = entry_point
         self.buffers = buffers
 
-    fn __moveinit__(inout self, owned rhs: Self):
-        self.module = rhs.module
-        self.entry_point = StringSlice(
-            unsafe_from_utf8=rhs.entry_point.as_bytes_slice()
-        )
-        self.buffers = rhs.buffers
 
-    fn __copyinit__(inout self, rhs: Self):
-        self.module = rhs.module
-        self.entry_point = StringSlice(
-            unsafe_from_utf8=rhs.entry_point.as_bytes_slice()
-        )
-        self.buffers = rhs.buffers
-
-
+@value
 struct PrimitiveState:
     """
     TODO
@@ -588,7 +574,7 @@ struct PrimitiveState:
     var cull_mode: CullMode
 
     fn __init__(
-        inout self,
+        out self,
         *,
         topology: PrimitiveTopology = PrimitiveTopology(0),
         strip_index_format: IndexFormat = IndexFormat(0),
@@ -599,18 +585,6 @@ struct PrimitiveState:
         self.strip_index_format = strip_index_format
         self.front_face = front_face
         self.cull_mode = cull_mode
-
-    fn __moveinit__(inout self, owned rhs: Self):
-        self.topology = rhs.topology
-        self.strip_index_format = rhs.strip_index_format
-        self.front_face = rhs.front_face
-        self.cull_mode = rhs.cull_mode
-
-    fn __copyinit__(inout self, rhs: Self):
-        self.topology = rhs.topology
-        self.strip_index_format = rhs.strip_index_format
-        self.front_face = rhs.front_face
-        self.cull_mode = rhs.cull_mode
 
 
 @value
@@ -651,7 +625,7 @@ struct MultisampleState:
     var alpha_to_coverage_enabled: Bool
 
     fn __init__(
-        inout self,
+        out self,
         *,
         count: UInt32 = 1,
         mask: UInt32 = ~0,
@@ -662,48 +636,34 @@ struct MultisampleState:
         self.alpha_to_coverage_enabled = alpha_to_coverage_enabled
 
 
+@value
 struct FragmentState[
-    mod: ImmutableLifetime, entry: ImmutableLifetime, tgt: ImmutableLifetime
+    mod: ImmutableOrigin, entry: ImmutableOrigin, tgt: ImmutableOrigin
 ]:
     """
     TODO
     """
 
-    var module: Reference[ShaderModule, mod]
+    var module: Pointer[ShaderModule, mod]
     var entry_point: StringSlice[entry]
     # var constants: Span[ConstantEntry, lifetime]
     var targets: Span[ColorTargetState, tgt]
 
     fn __init__(
-        inout self,
+        out self,
         *,
         ref [mod]module: ShaderModule,
         entry_point: StringSlice[entry],
         # constants: Span[ConstantEntry],
         targets: Span[ColorTargetState, tgt],
     ):
-        self.module = module
-        self.entry_point = StringSlice(
-            unsafe_from_utf8=entry_point.as_bytes_slice()
-        )
+        self.module = Pointer.address_of(module)
+        self.entry_point = entry_point
         # self.constants = constants
         self.targets = targets
 
-    fn __moveinit__(inout self, owned rhs: Self):
-        self.module = rhs.module
-        self.entry_point = StringSlice(
-            unsafe_from_utf8=rhs.entry_point.as_bytes_slice()
-        )
-        self.targets = rhs.targets
 
-    fn __copyinit__(inout self, rhs: Self):
-        self.module = rhs.module
-        self.entry_point = StringSlice(
-            unsafe_from_utf8=rhs.entry_point.as_bytes_slice()
-        )
-        self.targets = rhs.targets
-
-
+@value
 struct ColorTargetState:
     """
     TODO
@@ -713,82 +673,29 @@ struct ColorTargetState:
     var blend: Optional[BlendState]
     var write_mask: ColorWriteMask
 
-    fn __init__(
-        inout self,
-        format: TextureFormat,
-        write_mask: ColorWriteMask,
-        blend: Optional[BlendState],
-    ):
-        self.format = format
-        self.blend = blend
-        self.write_mask = write_mask
 
-    fn __moveinit__(inout self, owned rhs: Self):
-        self.format = rhs.format
-        self.blend = rhs.blend
-        self.write_mask = rhs.write_mask
-
-    fn __copyinit__(inout self, rhs: Self):
-        self.format = rhs.format
-        self.blend = rhs.blend
-        self.write_mask = rhs.write_mask
-
-
+@value
 struct RenderPipelineDescriptor[
-    lyt: ImmutableLifetime,
-    mod: ImmutableLifetime,
-    entry: ImmutableLifetime,
-    buf: ImmutableLifetime,
-    tgt: ImmutableLifetime,
+    lyt: ImmutableOrigin,
+    vmod: ImmutableOrigin,
+    ventry: ImmutableOrigin,
+    buf: ImmutableOrigin,
+    vbuf: ImmutableOrigin,
+    fmod: ImmutableOrigin,
+    fentry: ImmutableOrigin,
+    tgt: ImmutableOrigin,
 ]:
     """
     TODO
     """
 
     var label: StringLiteral
-    var layout: Optional[Reference[PipelineLayout, lyt]]
-    var vertex: VertexState[mod, entry, buf]
+    var layout: Optional[Pointer[PipelineLayout, lyt]]
+    var vertex: VertexState[vmod, ventry, buf, vbuf]
     var primitive: PrimitiveState
     var depth_stencil: Optional[DepthStencilState]
     var multisample: MultisampleState
-    var fragment: Optional[FragmentState[mod, entry, tgt]]
-
-    fn __init__(
-        inout self,
-        *,
-        label: StringLiteral,
-        vertex: VertexState[mod, entry, buf],
-        primitive: PrimitiveState,
-        multisample: MultisampleState,
-        layout: Optional[Reference[PipelineLayout, lyt]] = None,
-        depth_stencil: Optional[DepthStencilState] = None,
-        fragment: Optional[FragmentState[mod, entry, tgt]] = None,
-    ):
-        self.label = label
-        self.vertex = vertex
-        self.primitive = primitive
-        self.multisample = multisample
-        self.layout = layout
-        self.depth_stencil = depth_stencil
-        self.fragment = fragment
-
-    fn __moveinit__(inout self, owned rhs: Self):
-        self.label = rhs.label
-        self.vertex = rhs.vertex
-        self.primitive = rhs.primitive
-        self.multisample = rhs.multisample
-        self.layout = rhs.layout
-        self.depth_stencil = rhs.depth_stencil
-        self.fragment = rhs.fragment
-
-    fn __copyinit__(inout self, rhs: Self):
-        self.label = rhs.label
-        self.vertex = rhs.vertex
-        self.primitive = rhs.primitive
-        self.multisample = rhs.multisample
-        self.layout = rhs.layout
-        self.depth_stencil = rhs.depth_stencil
-        self.fragment = rhs.fragment
+    var fragment: Optional[FragmentState[fmod, fentry, tgt]]
 
 
 @value
@@ -827,7 +734,7 @@ struct ShaderModuleCompilationHint:
     """
 
     var entry_point: StringLiteral
-    var layout: Arc[PipelineLayout]
+    var layout: ArcPointer[PipelineLayout]
 
 
 @value
@@ -845,13 +752,13 @@ struct SurfaceTexture:
     TODO
     """
 
-    var texture: Arc[Texture]
+    var texture: ArcPointer[Texture]
     var suboptimal: Bool
     var status: SurfaceGetCurrentTextureStatus
 
     fn __init__(
-        inout self,
-        texture: Arc[Texture],
+        out self,
+        texture: ArcPointer[Texture],
         suboptimal: Bool = False,
         status: SurfaceGetCurrentTextureStatus = SurfaceGetCurrentTextureStatus(
             0
@@ -876,7 +783,7 @@ struct TextureDataLayout:
     var rows_per_image: Optional[UInt32]
 
     fn __init__(
-        inout self,
+        out self,
         offset: UInt64 = 0,
         bytes_per_row: Optional[UInt32] = None,
         rows_per_image: Optional[UInt32] = None,

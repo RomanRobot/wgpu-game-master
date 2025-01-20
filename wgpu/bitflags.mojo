@@ -13,16 +13,16 @@ struct BufferUsage:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias none = Self(0)
     """TODO"""
@@ -63,16 +63,16 @@ struct ColorWriteMask:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias none = Self(0)
     """TODO"""
@@ -103,16 +103,16 @@ struct MapMode:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias none = Self(0)
     """TODO"""
@@ -137,16 +137,16 @@ struct ShaderStage:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias none = Self(0)
     """TODO"""
@@ -173,16 +173,16 @@ struct TextureUsage:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias none = Self(0)
     """TODO"""
@@ -212,16 +212,16 @@ struct InstanceBackend:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias all = Self(0x00000000)
     alias vulkan = Self(1 << 0)
@@ -245,16 +245,16 @@ struct InstanceFlag:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias default = Self(0x00000000)
     alias debug = Self(1 << 0)
@@ -273,16 +273,16 @@ struct Dx12Compiler:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias undefined = Self(0x00000000)
     alias fxc = Self(0x00000001)
@@ -300,16 +300,16 @@ struct Gles3MinorVersion:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias automatic = Self(0x00000000)
     alias version0 = Self(0x00000001)
@@ -328,16 +328,16 @@ struct PipelineStatisticName:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias vertex_shader_invocations = Self(0x00000000)
     alias clipper_invocations = Self(0x00000001)
@@ -357,15 +357,15 @@ struct NativeQueryType:
         return self.value != rhs.value
 
     fn __xor__(self, rhs: Self) -> Self:
-        return self.value ^ rhs.value
+        return Self(self.value ^ rhs.value)
 
     fn __and__(self, rhs: Self) -> Self:
-        return self.value & rhs.value
+        return Self(self.value & rhs.value)
 
     fn __or__(self, rhs: Self) -> Self:
-        return self.value | rhs.value
+        return Self(self.value | rhs.value)
 
     fn __invert__(self) -> Self:
-        return ~self.value
+        return Self(~self.value)
 
     alias pipeline_statistics = Self(0x00030000)

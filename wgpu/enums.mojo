@@ -21,18 +21,18 @@ struct RequestAdapterStatus:
     alias unknown = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.success:
-            f.write("success")
+            w.write("success")
 
         elif self == Self.unavailable:
-            f.write("unavailable")
+            w.write("unavailable")
 
         elif self == Self.error:
-            f.write("error")
+            w.write("error")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
 
 @value
@@ -58,18 +58,18 @@ struct AdapterType:
     alias unknown = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.discrete_gpu:
-            f.write("discrete_gpu")
+            w.write("discrete_gpu")
 
         elif self == Self.integrated_gpu:
-            f.write("integrated_gpu")
+            w.write("integrated_gpu")
 
         elif self == Self.cpu:
-            f.write("cpu")
+            w.write("cpu")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
 
 @value
@@ -93,15 +93,15 @@ struct AddressMode:
     alias clamp_to_edge = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.repeat:
-            f.write("repeat")
+            w.write("repeat")
 
         elif self == Self.mirror_repeat:
-            f.write("mirror_repeat")
+            w.write("mirror_repeat")
 
         elif self == Self.clamp_to_edge:
-            f.write("clamp_to_edge")
+            w.write("clamp_to_edge")
 
 
 @value
@@ -137,33 +137,33 @@ struct BackendType:
     alias opengles = Self(8)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.null:
-            f.write("null")
+            w.write("null")
 
         elif self == Self.webgpu:
-            f.write("webgpu")
+            w.write("webgpu")
 
         elif self == Self.d3d11:
-            f.write("d3d11")
+            w.write("d3d11")
 
         elif self == Self.d3d12:
-            f.write("d3d12")
+            w.write("d3d12")
 
         elif self == Self.metal:
-            f.write("metal")
+            w.write("metal")
 
         elif self == Self.vulkan:
-            f.write("vulkan")
+            w.write("vulkan")
 
         elif self == Self.opengl:
-            f.write("opengl")
+            w.write("opengl")
 
         elif self == Self.opengles:
-            f.write("opengles")
+            w.write("opengles")
 
 
 @value
@@ -189,18 +189,18 @@ struct BufferBindingType:
     alias read_only_storage = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.uniform:
-            f.write("uniform")
+            w.write("uniform")
 
         elif self == Self.storage:
-            f.write("storage")
+            w.write("storage")
 
         elif self == Self.read_only_storage:
-            f.write("read_only_storage")
+            w.write("read_only_storage")
 
 
 @value
@@ -226,18 +226,18 @@ struct SamplerBindingType:
     alias comparison = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.filtering:
-            f.write("filtering")
+            w.write("filtering")
 
         elif self == Self.non_filtering:
-            f.write("non_filtering")
+            w.write("non_filtering")
 
         elif self == Self.comparison:
-            f.write("comparison")
+            w.write("comparison")
 
 
 @value
@@ -267,24 +267,24 @@ struct TextureSampleType:
     alias uint = Self(5)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.float:
-            f.write("float")
+            w.write("float")
 
         elif self == Self.unfilterable_float:
-            f.write("unfilterable_float")
+            w.write("unfilterable_float")
 
         elif self == Self.depth:
-            f.write("depth")
+            w.write("depth")
 
         elif self == Self.sint:
-            f.write("sint")
+            w.write("sint")
 
         elif self == Self.uint:
-            f.write("uint")
+            w.write("uint")
 
 
 @value
@@ -310,18 +310,18 @@ struct StorageTextureAccess:
     alias read_write = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.write_only:
-            f.write("write_only")
+            w.write("write_only")
 
         elif self == Self.read_only:
-            f.write("read_only")
+            w.write("read_only")
 
         elif self == Self.read_write:
-            f.write("read_write")
+            w.write("read_write")
 
 
 @value
@@ -365,45 +365,45 @@ struct BlendFactor:
     alias one_minus_constant = Self(12)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.zero:
-            f.write("zero")
+            w.write("zero")
 
         elif self == Self.one:
-            f.write("one")
+            w.write("one")
 
         elif self == Self.src:
-            f.write("src")
+            w.write("src")
 
         elif self == Self.one_minus_src:
-            f.write("one_minus_src")
+            w.write("one_minus_src")
 
         elif self == Self.src_alpha:
-            f.write("src_alpha")
+            w.write("src_alpha")
 
         elif self == Self.one_minus_src_alpha:
-            f.write("one_minus_src_alpha")
+            w.write("one_minus_src_alpha")
 
         elif self == Self.dst:
-            f.write("dst")
+            w.write("dst")
 
         elif self == Self.one_minus_dst:
-            f.write("one_minus_dst")
+            w.write("one_minus_dst")
 
         elif self == Self.dst_alpha:
-            f.write("dst_alpha")
+            w.write("dst_alpha")
 
         elif self == Self.one_minus_dst_alpha:
-            f.write("one_minus_dst_alpha")
+            w.write("one_minus_dst_alpha")
 
         elif self == Self.src_alpha_saturated:
-            f.write("src_alpha_saturated")
+            w.write("src_alpha_saturated")
 
         elif self == Self.constant:
-            f.write("constant")
+            w.write("constant")
 
         elif self == Self.one_minus_constant:
-            f.write("one_minus_constant")
+            w.write("one_minus_constant")
 
 
 @value
@@ -431,21 +431,21 @@ struct BlendOperation:
     alias max = Self(4)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.add:
-            f.write("add")
+            w.write("add")
 
         elif self == Self.subtract:
-            f.write("subtract")
+            w.write("subtract")
 
         elif self == Self.reverse_subtract:
-            f.write("reverse_subtract")
+            w.write("reverse_subtract")
 
         elif self == Self.min:
-            f.write("min")
+            w.write("min")
 
         elif self == Self.max:
-            f.write("max")
+            w.write("max")
 
 
 @value
@@ -481,33 +481,33 @@ struct BufferMapAsyncStatus:
     alias size_out_of_range = Self(8)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.success:
-            f.write("success")
+            w.write("success")
 
         elif self == Self.validation_error:
-            f.write("validation_error")
+            w.write("validation_error")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
         elif self == Self.device_lost:
-            f.write("device_lost")
+            w.write("device_lost")
 
         elif self == Self.destroyed_before_callback:
-            f.write("destroyed_before_callback")
+            w.write("destroyed_before_callback")
 
         elif self == Self.unmapped_before_callback:
-            f.write("unmapped_before_callback")
+            w.write("unmapped_before_callback")
 
         elif self == Self.mapping_already_pending:
-            f.write("mapping_already_pending")
+            w.write("mapping_already_pending")
 
         elif self == Self.offset_out_of_range:
-            f.write("offset_out_of_range")
+            w.write("offset_out_of_range")
 
         elif self == Self.size_out_of_range:
-            f.write("size_out_of_range")
+            w.write("size_out_of_range")
 
 
 @value
@@ -531,15 +531,15 @@ struct BufferMapState:
     alias mapped = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.unmapped:
-            f.write("unmapped")
+            w.write("unmapped")
 
         elif self == Self.pending:
-            f.write("pending")
+            w.write("pending")
 
         elif self == Self.mapped:
-            f.write("mapped")
+            w.write("mapped")
 
 
 @value
@@ -575,33 +575,33 @@ struct CompareFunction:
     alias always = Self(8)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.never:
-            f.write("never")
+            w.write("never")
 
         elif self == Self.less:
-            f.write("less")
+            w.write("less")
 
         elif self == Self.less_equal:
-            f.write("less_equal")
+            w.write("less_equal")
 
         elif self == Self.greater:
-            f.write("greater")
+            w.write("greater")
 
         elif self == Self.greater_equal:
-            f.write("greater_equal")
+            w.write("greater_equal")
 
         elif self == Self.equal:
-            f.write("equal")
+            w.write("equal")
 
         elif self == Self.not_equal:
-            f.write("not_equal")
+            w.write("not_equal")
 
         elif self == Self.always:
-            f.write("always")
+            w.write("always")
 
 
 @value
@@ -627,18 +627,18 @@ struct CompilationInfoRequestStatus:
     alias unknown = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.success:
-            f.write("success")
+            w.write("success")
 
         elif self == Self.error:
-            f.write("error")
+            w.write("error")
 
         elif self == Self.device_lost:
-            f.write("device_lost")
+            w.write("device_lost")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
 
 @value
@@ -662,15 +662,15 @@ struct CompilationMessageType:
     alias info = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.error:
-            f.write("error")
+            w.write("error")
 
         elif self == Self.warning:
-            f.write("warning")
+            w.write("warning")
 
         elif self == Self.info:
-            f.write("info")
+            w.write("info")
 
 
 @value
@@ -698,21 +698,21 @@ struct CompositeAlphaMode:
     alias inherit = Self(4)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.auto:
-            f.write("auto")
+            w.write("auto")
 
         elif self == Self.opaque:
-            f.write("opaque")
+            w.write("opaque")
 
         elif self == Self.premultiplied:
-            f.write("premultiplied")
+            w.write("premultiplied")
 
         elif self == Self.unpremultiplied:
-            f.write("unpremultiplied")
+            w.write("unpremultiplied")
 
         elif self == Self.inherit:
-            f.write("inherit")
+            w.write("inherit")
 
 
 @value
@@ -742,24 +742,24 @@ struct CreatePipelineAsyncStatus:
     alias unknown = Self(5)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.success:
-            f.write("success")
+            w.write("success")
 
         elif self == Self.validation_error:
-            f.write("validation_error")
+            w.write("validation_error")
 
         elif self == Self.internal_error:
-            f.write("internal_error")
+            w.write("internal_error")
 
         elif self == Self.device_lost:
-            f.write("device_lost")
+            w.write("device_lost")
 
         elif self == Self.device_destroyed:
-            f.write("device_destroyed")
+            w.write("device_destroyed")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
 
 @value
@@ -783,15 +783,15 @@ struct CullMode:
     alias back = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.none:
-            f.write("none")
+            w.write("none")
 
         elif self == Self.front:
-            f.write("front")
+            w.write("front")
 
         elif self == Self.back:
-            f.write("back")
+            w.write("back")
 
 
 @value
@@ -813,12 +813,12 @@ struct DeviceLostReason:
     alias destroyed = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
         elif self == Self.destroyed:
-            f.write("destroyed")
+            w.write("destroyed")
 
 
 @value
@@ -842,15 +842,15 @@ struct ErrorFilter:
     alias internal = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.validation:
-            f.write("validation")
+            w.write("validation")
 
         elif self == Self.out_of_memory:
-            f.write("out_of_memory")
+            w.write("out_of_memory")
 
         elif self == Self.internal:
-            f.write("internal")
+            w.write("internal")
 
 
 @value
@@ -880,24 +880,24 @@ struct ErrorType:
     alias device_lost = Self(5)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.no_error:
-            f.write("no_error")
+            w.write("no_error")
 
         elif self == Self.validation:
-            f.write("validation")
+            w.write("validation")
 
         elif self == Self.out_of_memory:
-            f.write("out_of_memory")
+            w.write("out_of_memory")
 
         elif self == Self.internal:
-            f.write("internal")
+            w.write("internal")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
         elif self == Self.device_lost:
-            f.write("device_lost")
+            w.write("device_lost")
 
 
 @value
@@ -939,42 +939,42 @@ struct FeatureName:
     alias float32_filterable = Self(11)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.depth_clip_control:
-            f.write("depth_clip_control")
+            w.write("depth_clip_control")
 
         elif self == Self.depth32_float_stencil8:
-            f.write("depth32_float_stencil8")
+            w.write("depth32_float_stencil8")
 
         elif self == Self.timestamp_query:
-            f.write("timestamp_query")
+            w.write("timestamp_query")
 
         elif self == Self.texture_compression_bc:
-            f.write("texture_compression_bc")
+            w.write("texture_compression_bc")
 
         elif self == Self.texture_compression_etc2:
-            f.write("texture_compression_etc2")
+            w.write("texture_compression_etc2")
 
         elif self == Self.texture_compression_astc:
-            f.write("texture_compression_astc")
+            w.write("texture_compression_astc")
 
         elif self == Self.indirect_first_instance:
-            f.write("indirect_first_instance")
+            w.write("indirect_first_instance")
 
         elif self == Self.shader_f16:
-            f.write("shader_f16")
+            w.write("shader_f16")
 
         elif self == Self.rg11b10_ufloat_renderable:
-            f.write("rg11b10_ufloat_renderable")
+            w.write("rg11b10_ufloat_renderable")
 
         elif self == Self.bgra8_unorm_storage:
-            f.write("bgra8_unorm_storage")
+            w.write("bgra8_unorm_storage")
 
         elif self == Self.float32_filterable:
-            f.write("float32_filterable")
+            w.write("float32_filterable")
 
 
 @value
@@ -996,12 +996,12 @@ struct FilterMode:
     alias linear = Self(1)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.nearest:
-            f.write("nearest")
+            w.write("nearest")
 
         elif self == Self.linear:
-            f.write("linear")
+            w.write("linear")
 
 
 @value
@@ -1023,12 +1023,12 @@ struct FrontFace:
     alias cw = Self(1)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.ccw:
-            f.write("ccw")
+            w.write("ccw")
 
         elif self == Self.cw:
-            f.write("cw")
+            w.write("cw")
 
 
 @value
@@ -1052,15 +1052,15 @@ struct IndexFormat:
     alias uint32 = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.uint16:
-            f.write("uint16")
+            w.write("uint16")
 
         elif self == Self.uint32:
-            f.write("uint32")
+            w.write("uint32")
 
 
 @value
@@ -1084,15 +1084,15 @@ struct VertexStepMode:
     alias vertex_buffer_not_used = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.vertex:
-            f.write("vertex")
+            w.write("vertex")
 
         elif self == Self.instance:
-            f.write("instance")
+            w.write("instance")
 
         elif self == Self.vertex_buffer_not_used:
-            f.write("vertex_buffer_not_used")
+            w.write("vertex_buffer_not_used")
 
 
 @value
@@ -1116,15 +1116,15 @@ struct LoadOp:
     alias load = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.clear:
-            f.write("clear")
+            w.write("clear")
 
         elif self == Self.load:
-            f.write("load")
+            w.write("load")
 
 
 @value
@@ -1146,12 +1146,12 @@ struct MipmapFilterMode:
     alias linear = Self(1)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.nearest:
-            f.write("nearest")
+            w.write("nearest")
 
         elif self == Self.linear:
-            f.write("linear")
+            w.write("linear")
 
 
 @value
@@ -1175,15 +1175,15 @@ struct StoreOp:
     alias discard = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.store:
-            f.write("store")
+            w.write("store")
 
         elif self == Self.discard:
-            f.write("discard")
+            w.write("discard")
 
 
 @value
@@ -1207,15 +1207,15 @@ struct PowerPreference:
     alias high_performance = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.low_power:
-            f.write("low_power")
+            w.write("low_power")
 
         elif self == Self.high_performance:
-            f.write("high_performance")
+            w.write("high_performance")
 
 
 @value
@@ -1241,18 +1241,18 @@ struct PresentMode:
     alias mailbox = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.fifo:
-            f.write("fifo")
+            w.write("fifo")
 
         elif self == Self.fifo_relaxed:
-            f.write("fifo_relaxed")
+            w.write("fifo_relaxed")
 
         elif self == Self.immediate:
-            f.write("immediate")
+            w.write("immediate")
 
         elif self == Self.mailbox:
-            f.write("mailbox")
+            w.write("mailbox")
 
 
 @value
@@ -1280,21 +1280,21 @@ struct PrimitiveTopology:
     alias triangle_strip = Self(4)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.point_list:
-            f.write("point_list")
+            w.write("point_list")
 
         elif self == Self.line_list:
-            f.write("line_list")
+            w.write("line_list")
 
         elif self == Self.line_strip:
-            f.write("line_strip")
+            w.write("line_strip")
 
         elif self == Self.triangle_list:
-            f.write("triangle_list")
+            w.write("triangle_list")
 
         elif self == Self.triangle_strip:
-            f.write("triangle_strip")
+            w.write("triangle_strip")
 
 
 @value
@@ -1316,12 +1316,12 @@ struct QueryType:
     alias timestamp = Self(1)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.occlusion:
-            f.write("occlusion")
+            w.write("occlusion")
 
         elif self == Self.timestamp:
-            f.write("timestamp")
+            w.write("timestamp")
 
 
 @value
@@ -1347,18 +1347,18 @@ struct QueueWorkDoneStatus:
     alias device_lost = Self(3)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.success:
-            f.write("success")
+            w.write("success")
 
         elif self == Self.error:
-            f.write("error")
+            w.write("error")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
         elif self == Self.device_lost:
-            f.write("device_lost")
+            w.write("device_lost")
 
 
 @value
@@ -1382,15 +1382,15 @@ struct RequestDeviceStatus:
     alias unknown = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.success:
-            f.write("success")
+            w.write("success")
 
         elif self == Self.error:
-            f.write("error")
+            w.write("error")
 
         elif self == Self.unknown:
-            f.write("unknown")
+            w.write("unknown")
 
 
 @value
@@ -1424,30 +1424,30 @@ struct StencilOperation:
     alias decrement_wrap = Self(7)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.keep:
-            f.write("keep")
+            w.write("keep")
 
         elif self == Self.zero:
-            f.write("zero")
+            w.write("zero")
 
         elif self == Self.replace:
-            f.write("replace")
+            w.write("replace")
 
         elif self == Self.invert:
-            f.write("invert")
+            w.write("invert")
 
         elif self == Self.increment_clamp:
-            f.write("increment_clamp")
+            w.write("increment_clamp")
 
         elif self == Self.decrement_clamp:
-            f.write("decrement_clamp")
+            w.write("decrement_clamp")
 
         elif self == Self.increment_wrap:
-            f.write("increment_wrap")
+            w.write("increment_wrap")
 
         elif self == Self.decrement_wrap:
-            f.write("decrement_wrap")
+            w.write("decrement_wrap")
 
 
 @value
@@ -1489,42 +1489,42 @@ struct SType:
     alias render_pass_descriptor_max_draw_count = Self(15)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.invalid:
-            f.write("invalid")
+            w.write("invalid")
 
         elif self == Self.surface_descriptor_from_metal_layer:
-            f.write("surface_descriptor_from_metal_layer")
+            w.write("surface_descriptor_from_metal_layer")
 
         elif self == Self.surface_descriptor_from_windows_hwnd:
-            f.write("surface_descriptor_from_windows_hwnd")
+            w.write("surface_descriptor_from_windows_hwnd")
 
         elif self == Self.surface_descriptor_from_xlib_window:
-            f.write("surface_descriptor_from_xlib_window")
+            w.write("surface_descriptor_from_xlib_window")
 
         elif self == Self.surface_descriptor_from_canvas_html_selector:
-            f.write("surface_descriptor_from_canvas_html_selector")
+            w.write("surface_descriptor_from_canvas_html_selector")
 
         elif self == Self.shader_module_spirv_descriptor:
-            f.write("shader_module_spirv_descriptor")
+            w.write("shader_module_spirv_descriptor")
 
         elif self == Self.shader_module_wgsl_descriptor:
-            f.write("shader_module_wgsl_descriptor")
+            w.write("shader_module_wgsl_descriptor")
 
         elif self == Self.primitive_depth_clip_control:
-            f.write("primitive_depth_clip_control")
+            w.write("primitive_depth_clip_control")
 
         elif self == Self.surface_descriptor_from_wayland_surface:
-            f.write("surface_descriptor_from_wayland_surface")
+            w.write("surface_descriptor_from_wayland_surface")
 
         elif self == Self.surface_descriptor_from_android_native_window:
-            f.write("surface_descriptor_from_android_native_window")
+            w.write("surface_descriptor_from_android_native_window")
 
         elif self == Self.surface_descriptor_from_xcb_window:
-            f.write("surface_descriptor_from_xcb_window")
+            w.write("surface_descriptor_from_xcb_window")
 
         elif self == Self.render_pass_descriptor_max_draw_count:
-            f.write("render_pass_descriptor_max_draw_count")
+            w.write("render_pass_descriptor_max_draw_count")
 
 
 @value
@@ -1554,24 +1554,24 @@ struct SurfaceGetCurrentTextureStatus:
     alias device_lost = Self(5)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.success:
-            f.write("success")
+            w.write("success")
 
         elif self == Self.timeout:
-            f.write("timeout")
+            w.write("timeout")
 
         elif self == Self.outdated:
-            f.write("outdated")
+            w.write("outdated")
 
         elif self == Self.lost:
-            f.write("lost")
+            w.write("lost")
 
         elif self == Self.out_of_memory:
-            f.write("out_of_memory")
+            w.write("out_of_memory")
 
         elif self == Self.device_lost:
-            f.write("device_lost")
+            w.write("device_lost")
 
 
 @value
@@ -1595,15 +1595,15 @@ struct TextureAspect:
     alias depth_only = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.all:
-            f.write("all")
+            w.write("all")
 
         elif self == Self.stencil_only:
-            f.write("stencil_only")
+            w.write("stencil_only")
 
         elif self == Self.depth_only:
-            f.write("depth_only")
+            w.write("depth_only")
 
 
 @value
@@ -1627,15 +1627,15 @@ struct TextureDimension:
     alias d3 = Self(2)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.d1:
-            f.write("d1")
+            w.write("d1")
 
         elif self == Self.d2:
-            f.write("d2")
+            w.write("d2")
 
         elif self == Self.d3:
-            f.write("d3")
+            w.write("d3")
 
 
 @value
@@ -1845,294 +1845,294 @@ struct TextureFormat:
     alias astc_12x12_unorm_srgb = Self(95)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.r8_unorm:
-            f.write("r8_unorm")
+            w.write("r8_unorm")
 
         elif self == Self.r8_snorm:
-            f.write("r8_snorm")
+            w.write("r8_snorm")
 
         elif self == Self.r8_uint:
-            f.write("r8_uint")
+            w.write("r8_uint")
 
         elif self == Self.r8_sint:
-            f.write("r8_sint")
+            w.write("r8_sint")
 
         elif self == Self.r16_uint:
-            f.write("r16_uint")
+            w.write("r16_uint")
 
         elif self == Self.r16_sint:
-            f.write("r16_sint")
+            w.write("r16_sint")
 
         elif self == Self.r16_float:
-            f.write("r16_float")
+            w.write("r16_float")
 
         elif self == Self.rg8_unorm:
-            f.write("rg8_unorm")
+            w.write("rg8_unorm")
 
         elif self == Self.rg8_snorm:
-            f.write("rg8_snorm")
+            w.write("rg8_snorm")
 
         elif self == Self.rg8_uint:
-            f.write("rg8_uint")
+            w.write("rg8_uint")
 
         elif self == Self.rg8_sint:
-            f.write("rg8_sint")
+            w.write("rg8_sint")
 
         elif self == Self.r32_float:
-            f.write("r32_float")
+            w.write("r32_float")
 
         elif self == Self.r32_uint:
-            f.write("r32_uint")
+            w.write("r32_uint")
 
         elif self == Self.r32_sint:
-            f.write("r32_sint")
+            w.write("r32_sint")
 
         elif self == Self.rg16_uint:
-            f.write("rg16_uint")
+            w.write("rg16_uint")
 
         elif self == Self.rg16_sint:
-            f.write("rg16_sint")
+            w.write("rg16_sint")
 
         elif self == Self.rg16_float:
-            f.write("rg16_float")
+            w.write("rg16_float")
 
         elif self == Self.rgba8_unorm:
-            f.write("rgba8_unorm")
+            w.write("rgba8_unorm")
 
         elif self == Self.rgba8_unorm_srgb:
-            f.write("rgba8_unorm_srgb")
+            w.write("rgba8_unorm_srgb")
 
         elif self == Self.rgba8_snorm:
-            f.write("rgba8_snorm")
+            w.write("rgba8_snorm")
 
         elif self == Self.rgba8_uint:
-            f.write("rgba8_uint")
+            w.write("rgba8_uint")
 
         elif self == Self.rgba8_sint:
-            f.write("rgba8_sint")
+            w.write("rgba8_sint")
 
         elif self == Self.bgra8_unorm:
-            f.write("bgra8_unorm")
+            w.write("bgra8_unorm")
 
         elif self == Self.bgra8_unorm_srgb:
-            f.write("bgra8_unorm_srgb")
+            w.write("bgra8_unorm_srgb")
 
         elif self == Self.rgb10_a2_uint:
-            f.write("rgb10_a2_uint")
+            w.write("rgb10_a2_uint")
 
         elif self == Self.rgb10_a2_unorm:
-            f.write("rgb10_a2_unorm")
+            w.write("rgb10_a2_unorm")
 
         elif self == Self.rg11_b10_ufloat:
-            f.write("rg11_b10_ufloat")
+            w.write("rg11_b10_ufloat")
 
         elif self == Self.rgb9_e5_ufloat:
-            f.write("rgb9_e5_ufloat")
+            w.write("rgb9_e5_ufloat")
 
         elif self == Self.rg32_float:
-            f.write("rg32_float")
+            w.write("rg32_float")
 
         elif self == Self.rg32_uint:
-            f.write("rg32_uint")
+            w.write("rg32_uint")
 
         elif self == Self.rg32_sint:
-            f.write("rg32_sint")
+            w.write("rg32_sint")
 
         elif self == Self.rgba16_uint:
-            f.write("rgba16_uint")
+            w.write("rgba16_uint")
 
         elif self == Self.rgba16_sint:
-            f.write("rgba16_sint")
+            w.write("rgba16_sint")
 
         elif self == Self.rgba16_float:
-            f.write("rgba16_float")
+            w.write("rgba16_float")
 
         elif self == Self.rgba32_float:
-            f.write("rgba32_float")
+            w.write("rgba32_float")
 
         elif self == Self.rgba32_uint:
-            f.write("rgba32_uint")
+            w.write("rgba32_uint")
 
         elif self == Self.rgba32_sint:
-            f.write("rgba32_sint")
+            w.write("rgba32_sint")
 
         elif self == Self.stencil8:
-            f.write("stencil8")
+            w.write("stencil8")
 
         elif self == Self.depth16_unorm:
-            f.write("depth16_unorm")
+            w.write("depth16_unorm")
 
         elif self == Self.depth24_plus:
-            f.write("depth24_plus")
+            w.write("depth24_plus")
 
         elif self == Self.depth24_plus_stencil8:
-            f.write("depth24_plus_stencil8")
+            w.write("depth24_plus_stencil8")
 
         elif self == Self.depth32_float:
-            f.write("depth32_float")
+            w.write("depth32_float")
 
         elif self == Self.depth32_float_stencil8:
-            f.write("depth32_float_stencil8")
+            w.write("depth32_float_stencil8")
 
         elif self == Self.bc1_rgba_unorm:
-            f.write("bc1_rgba_unorm")
+            w.write("bc1_rgba_unorm")
 
         elif self == Self.bc1_rgba_unorm_srgb:
-            f.write("bc1_rgba_unorm_srgb")
+            w.write("bc1_rgba_unorm_srgb")
 
         elif self == Self.bc2_rgba_unorm:
-            f.write("bc2_rgba_unorm")
+            w.write("bc2_rgba_unorm")
 
         elif self == Self.bc2_rgba_unorm_srgb:
-            f.write("bc2_rgba_unorm_srgb")
+            w.write("bc2_rgba_unorm_srgb")
 
         elif self == Self.bc3_rgba_unorm:
-            f.write("bc3_rgba_unorm")
+            w.write("bc3_rgba_unorm")
 
         elif self == Self.bc3_rgba_unorm_srgb:
-            f.write("bc3_rgba_unorm_srgb")
+            w.write("bc3_rgba_unorm_srgb")
 
         elif self == Self.bc4_r_unorm:
-            f.write("bc4_r_unorm")
+            w.write("bc4_r_unorm")
 
         elif self == Self.bc4_r_snorm:
-            f.write("bc4_r_snorm")
+            w.write("bc4_r_snorm")
 
         elif self == Self.bc5_rg_unorm:
-            f.write("bc5_rg_unorm")
+            w.write("bc5_rg_unorm")
 
         elif self == Self.bc5_rg_snorm:
-            f.write("bc5_rg_snorm")
+            w.write("bc5_rg_snorm")
 
         elif self == Self.bc6h_rgb_ufloat:
-            f.write("bc6h_rgb_ufloat")
+            w.write("bc6h_rgb_ufloat")
 
         elif self == Self.bc6h_rgb_float:
-            f.write("bc6h_rgb_float")
+            w.write("bc6h_rgb_float")
 
         elif self == Self.bc7_rgba_unorm:
-            f.write("bc7_rgba_unorm")
+            w.write("bc7_rgba_unorm")
 
         elif self == Self.bc7_rgba_unorm_srgb:
-            f.write("bc7_rgba_unorm_srgb")
+            w.write("bc7_rgba_unorm_srgb")
 
         elif self == Self.etc2_rgb8_unorm:
-            f.write("etc2_rgb8_unorm")
+            w.write("etc2_rgb8_unorm")
 
         elif self == Self.etc2_rgb8_unorm_srgb:
-            f.write("etc2_rgb8_unorm_srgb")
+            w.write("etc2_rgb8_unorm_srgb")
 
         elif self == Self.etc2_rgb8a1_unorm:
-            f.write("etc2_rgb8a1_unorm")
+            w.write("etc2_rgb8a1_unorm")
 
         elif self == Self.etc2_rgb8a1_unorm_srgb:
-            f.write("etc2_rgb8a1_unorm_srgb")
+            w.write("etc2_rgb8a1_unorm_srgb")
 
         elif self == Self.etc2_rgba8_unorm:
-            f.write("etc2_rgba8_unorm")
+            w.write("etc2_rgba8_unorm")
 
         elif self == Self.etc2_rgba8_unorm_srgb:
-            f.write("etc2_rgba8_unorm_srgb")
+            w.write("etc2_rgba8_unorm_srgb")
 
         elif self == Self.eac_r11_unorm:
-            f.write("eac_r11_unorm")
+            w.write("eac_r11_unorm")
 
         elif self == Self.eac_r11_snorm:
-            f.write("eac_r11_snorm")
+            w.write("eac_r11_snorm")
 
         elif self == Self.eac_rg11_unorm:
-            f.write("eac_rg11_unorm")
+            w.write("eac_rg11_unorm")
 
         elif self == Self.eac_rg11_snorm:
-            f.write("eac_rg11_snorm")
+            w.write("eac_rg11_snorm")
 
         elif self == Self.astc_4x4_unorm:
-            f.write("astc_4x4_unorm")
+            w.write("astc_4x4_unorm")
 
         elif self == Self.astc_4x4_unorm_srgb:
-            f.write("astc_4x4_unorm_srgb")
+            w.write("astc_4x4_unorm_srgb")
 
         elif self == Self.astc_5x4_unorm:
-            f.write("astc_5x4_unorm")
+            w.write("astc_5x4_unorm")
 
         elif self == Self.astc_5x4_unorm_srgb:
-            f.write("astc_5x4_unorm_srgb")
+            w.write("astc_5x4_unorm_srgb")
 
         elif self == Self.astc_5x5_unorm:
-            f.write("astc_5x5_unorm")
+            w.write("astc_5x5_unorm")
 
         elif self == Self.astc_5x5_unorm_srgb:
-            f.write("astc_5x5_unorm_srgb")
+            w.write("astc_5x5_unorm_srgb")
 
         elif self == Self.astc_6x5_unorm:
-            f.write("astc_6x5_unorm")
+            w.write("astc_6x5_unorm")
 
         elif self == Self.astc_6x5_unorm_srgb:
-            f.write("astc_6x5_unorm_srgb")
+            w.write("astc_6x5_unorm_srgb")
 
         elif self == Self.astc_6x6_unorm:
-            f.write("astc_6x6_unorm")
+            w.write("astc_6x6_unorm")
 
         elif self == Self.astc_6x6_unorm_srgb:
-            f.write("astc_6x6_unorm_srgb")
+            w.write("astc_6x6_unorm_srgb")
 
         elif self == Self.astc_8x5_unorm:
-            f.write("astc_8x5_unorm")
+            w.write("astc_8x5_unorm")
 
         elif self == Self.astc_8x5_unorm_srgb:
-            f.write("astc_8x5_unorm_srgb")
+            w.write("astc_8x5_unorm_srgb")
 
         elif self == Self.astc_8x6_unorm:
-            f.write("astc_8x6_unorm")
+            w.write("astc_8x6_unorm")
 
         elif self == Self.astc_8x6_unorm_srgb:
-            f.write("astc_8x6_unorm_srgb")
+            w.write("astc_8x6_unorm_srgb")
 
         elif self == Self.astc_8x8_unorm:
-            f.write("astc_8x8_unorm")
+            w.write("astc_8x8_unorm")
 
         elif self == Self.astc_8x8_unorm_srgb:
-            f.write("astc_8x8_unorm_srgb")
+            w.write("astc_8x8_unorm_srgb")
 
         elif self == Self.astc_10x5_unorm:
-            f.write("astc_10x5_unorm")
+            w.write("astc_10x5_unorm")
 
         elif self == Self.astc_10x5_unorm_srgb:
-            f.write("astc_10x5_unorm_srgb")
+            w.write("astc_10x5_unorm_srgb")
 
         elif self == Self.astc_10x6_unorm:
-            f.write("astc_10x6_unorm")
+            w.write("astc_10x6_unorm")
 
         elif self == Self.astc_10x6_unorm_srgb:
-            f.write("astc_10x6_unorm_srgb")
+            w.write("astc_10x6_unorm_srgb")
 
         elif self == Self.astc_10x8_unorm:
-            f.write("astc_10x8_unorm")
+            w.write("astc_10x8_unorm")
 
         elif self == Self.astc_10x8_unorm_srgb:
-            f.write("astc_10x8_unorm_srgb")
+            w.write("astc_10x8_unorm_srgb")
 
         elif self == Self.astc_10x10_unorm:
-            f.write("astc_10x10_unorm")
+            w.write("astc_10x10_unorm")
 
         elif self == Self.astc_10x10_unorm_srgb:
-            f.write("astc_10x10_unorm_srgb")
+            w.write("astc_10x10_unorm_srgb")
 
         elif self == Self.astc_12x10_unorm:
-            f.write("astc_12x10_unorm")
+            w.write("astc_12x10_unorm")
 
         elif self == Self.astc_12x10_unorm_srgb:
-            f.write("astc_12x10_unorm_srgb")
+            w.write("astc_12x10_unorm_srgb")
 
         elif self == Self.astc_12x12_unorm:
-            f.write("astc_12x12_unorm")
+            w.write("astc_12x12_unorm")
 
         elif self == Self.astc_12x12_unorm_srgb:
-            f.write("astc_12x12_unorm_srgb")
+            w.write("astc_12x12_unorm_srgb")
 
 
 @value
@@ -2164,27 +2164,27 @@ struct TextureViewDimension:
     alias d3 = Self(6)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.denifednu:
-            f.write("denifednu")
+            w.write("denifednu")
 
         elif self == Self.d1:
-            f.write("d1")
+            w.write("d1")
 
         elif self == Self.d2:
-            f.write("d2")
+            w.write("d2")
 
         elif self == Self.yarra_d2:
-            f.write("yarra_d2")
+            w.write("yarra_d2")
 
         elif self == Self.ebuc:
-            f.write("ebuc")
+            w.write("ebuc")
 
         elif self == Self.yarra_ebuc:
-            f.write("yarra_ebuc")
+            w.write("yarra_ebuc")
 
         elif self == Self.d3:
-            f.write("d3")
+            w.write("d3")
 
 
 @value
@@ -2264,99 +2264,99 @@ struct VertexFormat:
     alias sint32x4 = Self(30)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.uint8x2:
-            f.write("uint8x2")
+            w.write("uint8x2")
 
         elif self == Self.uint8x4:
-            f.write("uint8x4")
+            w.write("uint8x4")
 
         elif self == Self.sint8x2:
-            f.write("sint8x2")
+            w.write("sint8x2")
 
         elif self == Self.sint8x4:
-            f.write("sint8x4")
+            w.write("sint8x4")
 
         elif self == Self.unorm8x2:
-            f.write("unorm8x2")
+            w.write("unorm8x2")
 
         elif self == Self.unorm8x4:
-            f.write("unorm8x4")
+            w.write("unorm8x4")
 
         elif self == Self.snorm8x2:
-            f.write("snorm8x2")
+            w.write("snorm8x2")
 
         elif self == Self.snorm8x4:
-            f.write("snorm8x4")
+            w.write("snorm8x4")
 
         elif self == Self.uint16x2:
-            f.write("uint16x2")
+            w.write("uint16x2")
 
         elif self == Self.uint16x4:
-            f.write("uint16x4")
+            w.write("uint16x4")
 
         elif self == Self.sint16x2:
-            f.write("sint16x2")
+            w.write("sint16x2")
 
         elif self == Self.sint16x4:
-            f.write("sint16x4")
+            w.write("sint16x4")
 
         elif self == Self.unorm16x2:
-            f.write("unorm16x2")
+            w.write("unorm16x2")
 
         elif self == Self.unorm16x4:
-            f.write("unorm16x4")
+            w.write("unorm16x4")
 
         elif self == Self.snorm16x2:
-            f.write("snorm16x2")
+            w.write("snorm16x2")
 
         elif self == Self.snorm16x4:
-            f.write("snorm16x4")
+            w.write("snorm16x4")
 
         elif self == Self.float16x2:
-            f.write("float16x2")
+            w.write("float16x2")
 
         elif self == Self.float16x4:
-            f.write("float16x4")
+            w.write("float16x4")
 
         elif self == Self.float32:
-            f.write("float32")
+            w.write("float32")
 
         elif self == Self.float32x2:
-            f.write("float32x2")
+            w.write("float32x2")
 
         elif self == Self.float32x3:
-            f.write("float32x3")
+            w.write("float32x3")
 
         elif self == Self.float32x4:
-            f.write("float32x4")
+            w.write("float32x4")
 
         elif self == Self.uint32:
-            f.write("uint32")
+            w.write("uint32")
 
         elif self == Self.uint32x2:
-            f.write("uint32x2")
+            w.write("uint32x2")
 
         elif self == Self.uint32x3:
-            f.write("uint32x3")
+            w.write("uint32x3")
 
         elif self == Self.uint32x4:
-            f.write("uint32x4")
+            w.write("uint32x4")
 
         elif self == Self.sint32:
-            f.write("sint32")
+            w.write("sint32")
 
         elif self == Self.sint32x2:
-            f.write("sint32x2")
+            w.write("sint32x2")
 
         elif self == Self.sint32x3:
-            f.write("sint32x3")
+            w.write("sint32x3")
 
         elif self == Self.sint32x4:
-            f.write("sint32x4")
+            w.write("sint32x4")
 
 
 @value
@@ -2384,21 +2384,21 @@ struct WgslFeatureName:
     alias pointer_composite_access = Self(4)
     """TODO"""
 
-    fn format_to(self, inout f: Formatter):
+    fn write_to[W: Writer](self, mut w: W):
         if self == Self.undefined:
-            f.write("undefined")
+            w.write("undefined")
 
         elif self == Self.readonly_and_readwrite_storage_textures:
-            f.write("readonly_and_readwrite_storage_textures")
+            w.write("readonly_and_readwrite_storage_textures")
 
         elif self == Self.packed4x8_integer_dot_product:
-            f.write("packed4x8_integer_dot_product")
+            w.write("packed4x8_integer_dot_product")
 
         elif self == Self.unrestricted_pointer_parameters:
-            f.write("unrestricted_pointer_parameters")
+            w.write("unrestricted_pointer_parameters")
 
         elif self == Self.pointer_composite_access:
-            f.write("pointer_composite_access")
+            w.write("pointer_composite_access")
 
 
 # WGPU SPECIFIC ENUMS

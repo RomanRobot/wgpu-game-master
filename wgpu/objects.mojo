@@ -1,6 +1,7 @@
 import sys
-from utils import Span, StringSlice
-from memory import Arc
+from memory import Span, UnsafePointer
+from collections.string import StringSlice
+from memory import ArcPointer
 
 from .bitflags import *
 from .constants import *
@@ -14,10 +15,10 @@ import .glfw
 struct Adapter:
     var _handle: _c.WGPUAdapter
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUAdapter):
+    fn __init__(out self, unsafe_ptr: _c.WGPUAdapter):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUAdapter()
 
@@ -111,10 +112,10 @@ struct Adapter:
 struct BindGroup:
     var _handle: _c.WGPUBindGroup
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUBindGroup):
+    fn __init__(out self, unsafe_ptr: _c.WGPUBindGroup):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUBindGroup()
 
@@ -131,10 +132,10 @@ struct BindGroup:
 struct BindGroupLayout:
     var _handle: _c.WGPUBindGroupLayout
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUBindGroupLayout):
+    fn __init__(out self, unsafe_ptr: _c.WGPUBindGroupLayout):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUBindGroupLayout()
 
@@ -154,10 +155,10 @@ struct BindGroupLayout:
 struct Buffer:
     var _handle: _c.WGPUBuffer
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUBuffer):
+    fn __init__(out self, unsafe_ptr: _c.WGPUBuffer):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUBuffer()
 
@@ -247,10 +248,10 @@ struct Buffer:
 struct CommandBuffer:
     var _handle: _c.WGPUCommandBuffer
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUCommandBuffer):
+    fn __init__(out self, unsafe_ptr: _c.WGPUCommandBuffer):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUCommandBuffer()
 
@@ -270,10 +271,10 @@ struct CommandBuffer:
 struct CommandEncoder:
     var _handle: _c.WGPUCommandEncoder
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUCommandEncoder):
+    fn __init__(out self, unsafe_ptr: _c.WGPUCommandEncoder):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUCommandEncoder()
 
@@ -345,7 +346,7 @@ struct CommandEncoder:
             ),
         )
         _ = attachments
-        return handle
+        return RenderPassEncoder(handle)
 
     fn copy_buffer_to_buffer(
         self,
@@ -708,10 +709,10 @@ struct CommandEncoder:
 struct Device:
     var _handle: _c.WGPUDevice
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUDevice):
+    fn __init__(out self, unsafe_ptr: _c.WGPUDevice):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUDevice()
 
@@ -745,7 +746,7 @@ struct Device:
             ),
         )
         _ = entries
-        return handle
+        return BindGroup(handle)
 
     fn create_bind_group_layout(
         self, descriptor: BindGroupLayoutDescriptor
@@ -770,13 +771,15 @@ struct Device:
         #         #     # var storage_texture= WGPUStorageTextureBindingLayout
         #         # )
         #     )
-        return _c.device_create_bind_group_layout(
-            self._handle,
-            _c.WGPUBindGroupLayoutDescriptor(
-                label=descriptor.label.unsafe_cstr_ptr(),
-                entrie_count=len(descriptor.entries),
-                entries=UnsafePointer[_c.WGPUBindGroupLayoutEntry](),
-            ),
+        return BindGroupLayout(
+            _c.device_create_bind_group_layout(
+                self._handle,
+                _c.WGPUBindGroupLayoutDescriptor(
+                    label=descriptor.label.unsafe_cstr_ptr(),
+                    entrie_count=len(descriptor.entries),
+                    entries=UnsafePointer[_c.WGPUBindGroupLayoutEntry](),
+                ),
+            )
         )
 
     #     return _wgpu.get_function[
@@ -791,14 +794,16 @@ struct Device:
         """
         TODO
         """
-        return _c.device_create_buffer(
-            self._handle,
-            _c.WGPUBufferDescriptor(
-                label=descriptor.label.unsafe_cstr_ptr(),
-                usage=descriptor.usage,
-                size=descriptor.size,
-                mapped_at_creation=descriptor.mapped_at_creation,
-            ),
+        return Buffer(
+            _c.device_create_buffer(
+                self._handle,
+                _c.WGPUBufferDescriptor(
+                    label=descriptor.label.unsafe_cstr_ptr(),
+                    usage=descriptor.usage,
+                    size=descriptor.size,
+                    mapped_at_creation=descriptor.mapped_at_creation,
+                ),
+            )
         )
 
     fn create_command_encoder(
@@ -807,9 +812,11 @@ struct Device:
         """
         TODO
         """
-        return _c.device_create_command_encoder(
-            self._handle,
-            _c.WGPUCommandEncoderDescriptor(label=label.unsafe_cstr_ptr()),
+        return CommandEncoder(
+            _c.device_create_command_encoder(
+                self._handle,
+                _c.WGPUCommandEncoderDescriptor(label=label.unsafe_cstr_ptr()),
+            )
         )
 
     # fn device_create_compute_pipeline(
@@ -860,22 +867,26 @@ struct Device:
         """
         TODO
         """
-        return _c.device_create_pipeline_layout(
-            self._handle,
-            _c.WGPUPipelineLayoutDescriptor(label=label.unsafe_cstr_ptr()),
+        return PipelineLayout(
+            _c.device_create_pipeline_layout(
+                self._handle,
+                _c.WGPUPipelineLayoutDescriptor(label=label.unsafe_cstr_ptr()),
+            )
         )
 
     fn create_query_set(self, descriptor: QuerySetDescriptor) -> QuerySet:
         """
         TODO
         """
-        return _c.device_create_query_set(
-            self._handle,
-            _c.WGPUQuerySetDescriptor(
-                label=descriptor.label.unsafe_cstr_ptr(),
-                type=descriptor.type,
-                count=descriptor.count,
-            ),
+        return QuerySet(
+            _c.device_create_query_set(
+                self._handle,
+                _c.WGPUQuerySetDescriptor(
+                    label=descriptor.label.unsafe_cstr_ptr(),
+                    type=descriptor.type,
+                    count=descriptor.count,
+                ),
+            )
         )
 
     # fn device_create_render_pipeline_async(
@@ -929,7 +940,7 @@ struct Device:
         TODO
         """
         v_buf_len = len(descriptor.vertex.buffers)
-        buffers = List[_c.WGPUVertexBufferLayout](capacity=v_buf_len)
+        buffers = List[_c.WGPUVertexBufferLayout]()
         for buf in descriptor.vertex.buffers:
             buffers.append(
                 _c.WGPUVertexBufferLayout(
@@ -943,9 +954,7 @@ struct Device:
         targets = List[_c.WGPUColorTargetState]()
         if descriptor.fragment:
             for target in descriptor.fragment.value().targets:
-                blend = UnsafePointer.address_of(
-                    target[].blend.value()
-                ) if target[].blend else UnsafePointer[_c.WGPUBlendState]()
+                blend = UnsafePointer.address_of(target[].blend.value())
                 targets.append(
                     _c.WGPUColorTargetState(
                         format=target[].format,
@@ -989,27 +998,29 @@ struct Device:
         _ = buffers^
         _ = frag^
         _ = targets^
-        return handle
+        return RenderPipeline(handle)
 
     fn create_sampler(self, descriptor: SamplerDescriptor) -> Sampler:
         """
         TODO
         """
-        return _c.device_create_sampler(
-            self._handle,
-            _c.WGPUSamplerDescriptor(
-                label=descriptor.label.unsafe_cstr_ptr(),
-                address_mode_u=descriptor.address_mode_u,
-                address_mode_v=descriptor.address_mode_v,
-                address_mode_w=descriptor.address_mode_w,
-                mag_filter=descriptor.mag_filter,
-                min_filter=descriptor.min_filter,
-                mipmap_filter=descriptor.mipmap_filter,
-                lod_min_clamp=descriptor.lod_min_clamp,
-                lod_max_clamp=descriptor.lod_max_clamp,
-                compare=descriptor.compare,
-                max_anisotropy=descriptor.max_anisotropy,
-            ),
+        return Sampler(
+            _c.device_create_sampler(
+                self._handle,
+                _c.WGPUSamplerDescriptor(
+                    label=descriptor.label.unsafe_cstr_ptr(),
+                    address_mode_u=descriptor.address_mode_u,
+                    address_mode_v=descriptor.address_mode_v,
+                    address_mode_w=descriptor.address_mode_w,
+                    mag_filter=descriptor.mag_filter,
+                    min_filter=descriptor.min_filter,
+                    mipmap_filter=descriptor.mipmap_filter,
+                    lod_min_clamp=descriptor.lod_min_clamp,
+                    lod_max_clamp=descriptor.lod_max_clamp,
+                    compare=descriptor.compare,
+                    max_anisotropy=descriptor.max_anisotropy,
+                ),
+            )
         )
 
     fn create_wgsl_shader_module(
@@ -1034,25 +1045,27 @@ struct Device:
         _ = wgsl_shader^
         if not handle:
             raise Error("failed to create shader module.")
-        return handle
+        return ShaderModule(handle)
 
     fn create_texture(self, descriptor: TextureDescriptor) -> Texture:
         """
         TODO
         """
-        return _c.device_create_texture(
-            self._handle,
-            _c.WGPUTextureDescriptor(
-                label=descriptor.label.unsafe_cstr_ptr(),
-                usage=descriptor.usage,
-                dimension=descriptor.dimension,
-                size=descriptor.size,
-                format=descriptor.format,
-                mip_level_count=descriptor.mip_level_count,
-                sample_count=descriptor.sample_count,
-                view_format_count=len(descriptor.view_formats),
-                view_formats=descriptor.view_formats.unsafe_ptr(),
-            ),
+        return Texture(
+            _c.device_create_texture(
+                self._handle,
+                _c.WGPUTextureDescriptor(
+                    label=descriptor.label.unsafe_cstr_ptr(),
+                    usage=descriptor.usage,
+                    dimension=descriptor.dimension,
+                    size=descriptor.size,
+                    format=descriptor.format,
+                    mip_level_count=descriptor.mip_level_count,
+                    sample_count=descriptor.sample_count,
+                    view_format_count=len(descriptor.view_formats),
+                    view_formats=descriptor.view_formats.unsafe_ptr(),
+                ),
+            )
         )
 
     fn destroy(self):
@@ -1085,7 +1098,7 @@ struct Device:
         """
         TODO
         """
-        return _c.device_get_queue(self._handle)
+        return Queue(_c.device_get_queue(self._handle))
 
 
 # fn device_push_error_scope(handle: WGPUDevice, filter: ErrorFilter) -> None:
@@ -1122,12 +1135,12 @@ struct Device:
 struct Instance:
     var _handle: _c.WGPUInstance
 
-    fn __init__(inout self) raises:
+    fn __init__(out self) raises:
         self._handle = _c.create_instance()
         if not self._handle:
             raise Error("failed to create instance.")
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUInstance()
 
@@ -1137,14 +1150,14 @@ struct Instance:
 
     fn create_surface(
         self, window: glfw.Window
-    ) raises -> Surface[__lifetime_of(window)]:
+    ) raises -> Surface[__origin_of(window)]:
         """
         TODO
         """
         surface = _glfw_get_wgpu_surface(self._handle, window)
         if not surface:
             raise Error("failed to get surface.")
-        return surface
+        return Surface[__origin_of(window)](surface)
 
     fn has_wgsl_language_feature(self, feature: WgslFeatureName) -> Bool:
         """
@@ -1154,21 +1167,6 @@ struct Instance:
 
     fn process_events(self):
         _c.instance_process_events(self._handle)
-
-    fn request_adapter_sync[
-        window: ImmutableLifetime
-    ](
-        self,
-        surface: Surface[window],
-        power_preference: PowerPreference = PowerPreference.undefined,
-        force_fallback_adapter: Bool = False,
-    ) -> Adapter:
-        """
-        TODO
-        """
-
-        adapter = _request_adapter_sync(self._handle, surface._handle)
-        return Adapter(adapter)
 
     fn request_adapter_sync(
         self,
@@ -1180,14 +1178,40 @@ struct Instance:
             raise Error("failed to get adapter.")
         return Adapter(adapter)
 
+    fn request_adapter_sync(
+        self,
+        surface: Surface,
+        power_preference: PowerPreference = PowerPreference.undefined,
+        force_fallback_adapter: Bool = False,
+    ) raises -> Adapter:
+        adapter = _request_adapter_sync(
+            self._handle,
+            _c.WGPURequestAdapterOptions(compatible_surface=surface._handle),
+        )
+        if not adapter:
+            raise Error("failed to get adapter.")
+        return Adapter(adapter)
+
+    fn generate_report(self) -> _c.WGPUGlobalReport:
+        report = _c.WGPUGlobalReport()
+        _c.generate_report(self._handle, report)
+        return report
+
+    fn enumerate_adapters(self) -> Span[_c.WGPUAdapter, __origin_of(self)]:
+        ptr = UnsafePointer[_c.WGPUAdapter]()
+        len = _c.instance_enumerate_adapters(
+            self._handle, _c.WGPUInstanceEnumerateAdapterOptions(), ptr
+        )
+        return Span[_c.WGPUAdapter, __origin_of(self)](ptr=ptr, length=len)
+
 
 struct PipelineLayout:
     var _handle: _c.WGPUPipelineLayout
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUPipelineLayout):
+    fn __init__(out self, unsafe_ptr: _c.WGPUPipelineLayout):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUPipelineLayout()
 
@@ -1220,10 +1244,10 @@ struct PipelineLayout:
 struct QuerySet:
     var _handle: _c.WGPUQuerySet
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUQuerySet):
+    fn __init__(out self, unsafe_ptr: _c.WGPUQuerySet):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUQuerySet()
 
@@ -1285,10 +1309,10 @@ struct QuerySet:
 struct Queue:
     var _handle: _c.WGPUQueue
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUQueue):
+    fn __init__(out self, unsafe_ptr: _c.WGPUQueue):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUQueue()
 
@@ -1625,10 +1649,10 @@ struct Queue:
 struct RenderPassEncoder:
     var _handle: _c.WGPURenderPassEncoder
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPURenderPassEncoder):
+    fn __init__(out self, unsafe_ptr: _c.WGPURenderPassEncoder):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPURenderPassEncoder()
 
@@ -1919,10 +1943,10 @@ struct RenderPassEncoder:
 struct RenderPipeline:
     var _handle: _c.WGPURenderPipeline
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPURenderPipeline):
+    fn __init__(out self, unsafe_ptr: _c.WGPURenderPipeline):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPURenderPipeline()
 
@@ -1966,10 +1990,10 @@ struct RenderPipeline:
 struct Sampler:
     var _handle: _c.WGPUSampler
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUSampler):
+    fn __init__(out self, unsafe_ptr: _c.WGPUSampler):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUSampler()
 
@@ -1987,10 +2011,10 @@ struct Sampler:
 struct ShaderModule:
     var _handle: _c.WGPUShaderModule
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUShaderModule):
+    fn __init__(out self, unsafe_ptr: _c.WGPUShaderModule):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUShaderModule()
 
@@ -2035,13 +2059,13 @@ struct ShaderModule:
 #     ]("wgpuShaderModuleSetLabel")(handle, label)
 
 
-struct Surface[window: ImmutableLifetime]:
+struct Surface[window: ImmutableOrigin]:
     var _handle: _c.WGPUSurface
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUSurface):
+    fn __init__(out self, unsafe_ptr: _c.WGPUSurface):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUSurface()
 
@@ -2105,7 +2129,7 @@ struct Surface[window: ImmutableLifetime]:
         tex = _c.WGPUSurfaceTexture()
         _c.surface_get_current_texture(self._handle, tex)
         return SurfaceTexture(
-            texture=Arc(Texture(tex.texture)),
+            texture=ArcPointer(Texture(tex.texture)),
             suboptimal=tex.suboptimal,
             status=tex.status,
         )
@@ -2135,21 +2159,16 @@ struct Surface[window: ImmutableLifetime]:
 struct Texture:
     var _handle: _c.WGPUTexture
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUTexture):
+    fn __init__(out self, unsafe_ptr: _c.WGPUTexture):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUTexture()
 
     fn __del__(owned self):
         if self._handle:
             _c.texture_release(self._handle)
-
-    # fn texture_release(handle: WGPUTexture):
-    #     _wgpu.get_function[fn (UnsafePointer[_TextureImpl]) -> None](
-    #         "wgpuTextureRelease"
-    #     )(handle)
 
     fn create_view(
         self,
@@ -2162,7 +2181,7 @@ struct Texture:
         base_array_layer: UInt32 = 0,
         array_layer_count: UInt32 = ARRAY_LAYER_COUNT_UNDEFINED,
         aspect: TextureAspect = TextureAspect.all,
-    ) -> Arc[TextureView]:
+    ) -> ArcPointer[TextureView]:
         """
         TODO
         """
@@ -2300,10 +2319,10 @@ struct Texture:
 struct TextureView:
     var _handle: _c.WGPUTextureView
 
-    fn __init__(inout self, unsafe_ptr: _c.WGPUTextureView):
+    fn __init__(out self, unsafe_ptr: _c.WGPUTextureView):
         self._handle = unsafe_ptr
 
-    fn __moveinit__(inout self, owned rhs: Self):
+    fn __moveinit__(mut self, owned rhs: Self):
         self._handle = rhs._handle
         rhs._handle = _c.WGPUTextureView()
 
@@ -2396,9 +2415,12 @@ fn _glfw_get_wgpu_surface(
 
 
 fn _request_adapter_sync(
-    instance: _c.WGPUInstance, surface: _c.WGPUSurface
+    instance: _c.WGPUInstance,
+    opts: _c.WGPURequestAdapterOptions = _c.WGPURequestAdapterOptions(),
 ) -> _c.WGPUAdapter:
-    fn req_adapter(
+    adapter_user_data = (_c.WGPUAdapter(), False)
+
+    fn _req_adapter(
         status: RequestAdapterStatus,
         adapter: _c.WGPUAdapter,
         message: UnsafePointer[Int8],
@@ -2408,37 +2430,11 @@ fn _request_adapter_sync(
         u_data[][0] = adapter
         u_data[][1] = True
 
-    adapter_user_data = (_c.WGPUAdapter(), False)
-
-    _c.instance_request_adapter(
-        instance,
-        req_adapter,
-        UnsafePointer.address_of(adapter_user_data).bitcast[NoneType](),
-        options=_c.WGPURequestAdapterOptions(compatible_surface=surface),
-    )
-    debug_assert(adapter_user_data[1], "adapter request did not finish")
-    adapter = adapter_user_data[0]
-    return adapter
-
-
-fn _req_adapter(
-    status: RequestAdapterStatus,
-    adapter: _c.WGPUAdapter,
-    message: UnsafePointer[Int8],
-    user_data: UnsafePointer[NoneType],
-):
-    u_data = user_data.bitcast[Tuple[_c.WGPUAdapter, Bool]]()
-    u_data[][0] = adapter
-    u_data[][1] = True
-
-
-fn _request_adapter_sync(instance: _c.WGPUInstance) -> _c.WGPUAdapter:
-    adapter_user_data = (_c.WGPUAdapter(), False)
-
     _c.instance_request_adapter(
         instance,
         _req_adapter,
         UnsafePointer.address_of(adapter_user_data).bitcast[NoneType](),
+        opts,
     )
     debug_assert(adapter_user_data[1], "adapter request did not finish")
     adapter = adapter_user_data[0]

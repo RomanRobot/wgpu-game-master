@@ -1,3 +1,5 @@
+**NOTE: THIS IS NOT A MODULAR PROJECT!!!**
+
 # WGPU Mojo
 
 This repo shows proof of concept bindings to [wgpu-native](https://github.com/gfx-rs/wgpu-native/).

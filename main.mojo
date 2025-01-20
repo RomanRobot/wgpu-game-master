@@ -1,7 +1,7 @@
 import wgpu
 from wgpu import glfw
 
-from utils import Span
+from memory import Span
 from collections import Optional
 
 
@@ -52,62 +52,45 @@ def main():
 
     shader_module = device.create_wgsl_shader_module(code=shader_code)
 
-    targets = List[wgpu.ColorTargetState](
-        wgpu.ColorTargetState(
-            blend=wgpu.BlendState(
-                color=wgpu.BlendComponent(
-                    src_factor=wgpu.BlendFactor.src_alpha,
-                    dst_factor=wgpu.BlendFactor.one_minus_src_alpha,
-                    operation=wgpu.BlendOperation.add,
-                ),
-                alpha=wgpu.BlendComponent(
-                    src_factor=wgpu.BlendFactor.zero,
-                    dst_factor=wgpu.BlendFactor.one,
-                    operation=wgpu.BlendOperation.add,
-                ),
+    desc = wgpu.RenderPipelineDescriptor(
+        label="render pipeline",
+        vertex=wgpu.VertexState(
+            entry_point="vs_main",
+            module=shader_module,
+            buffers=List[wgpu.VertexBufferLayout[StaticConstantOrigin]](),
+        ),
+        fragment=wgpu.FragmentState(
+            module=shader_module,
+            entry_point="fs_main",
+            targets=List[wgpu.ColorTargetState](
+                wgpu.ColorTargetState(
+                    blend=wgpu.BlendState(
+                        color=wgpu.BlendComponent(
+                            src_factor=wgpu.BlendFactor.src_alpha,
+                            dst_factor=wgpu.BlendFactor.one_minus_src_alpha,
+                            operation=wgpu.BlendOperation.add,
+                        ),
+                        alpha=wgpu.BlendComponent(
+                            src_factor=wgpu.BlendFactor.zero,
+                            dst_factor=wgpu.BlendFactor.one,
+                            operation=wgpu.BlendOperation.add,
+                        ),
+                    ),
+                    format=surface_format,
+                    write_mask=wgpu.ColorWriteMask.all,
+                )
             ),
-            format=surface_format,
-            write_mask=wgpu.ColorWriteMask.all,
-        )
+        ),
+        primitive=wgpu.PrimitiveState(
+            topology=wgpu.PrimitiveTopology.triangle_list,
+        ),
+        multisample=wgpu.MultisampleState(),
+        layout=Optional[Pointer[wgpu.PipelineLayout, StaticConstantOrigin]](
+            None
+        ),
+        depth_stencil=None,
     )
-
-    pipeline = device.create_render_pipeline(
-        descriptor=wgpu.RenderPipelineDescriptor[
-            ImmutableStaticLifetime,
-            __lifetime_of(shader_module),
-            ImmutableStaticLifetime,
-            ImmutableStaticLifetime,
-            __lifetime_of(targets),
-        ](
-            label="render pipeline",
-            vertex=wgpu.VertexState[
-                __lifetime_of(shader_module),
-                ImmutableStaticLifetime,
-                ImmutableStaticLifetime,
-            ](
-                entry_point="vs_main".as_string_slice(),
-                module=shader_module,
-                buffers=List[
-                    wgpu.VertexBufferLayout[ImmutableStaticLifetime]
-                ](),
-            ),
-            fragment=wgpu.FragmentState[
-                __lifetime_of(shader_module),
-                ImmutableStaticLifetime,
-                __lifetime_of(targets),
-            ](
-                module=shader_module,
-                entry_point="fs_main".as_string_slice(),
-                targets=targets,
-            ),
-            primitive=wgpu.PrimitiveState(
-                topology=wgpu.PrimitiveTopology.triangle_list,
-            ),
-            multisample=wgpu.MultisampleState(),
-            layout=None,
-            depth_stencil=None,
-        )
-    )
+    pipeline = device.create_render_pipeline(descriptor=desc)
 
     while not window.should_close():
         glfw.poll_events()
