@@ -80,20 +80,21 @@ struct DeviceDescriptor:
         self.default_queue = default_queue
 
 
+# @value
+# struct BindGroupEntry:
+#     """
+#     TODO
+#     """
+
+#     var binding: UInt32
+#     var buffer: ArcPointer[Buffer]
+#     var offset: UInt64
+#     var size: UInt64
+#     var sampler: ArcPointer[Sampler]
+#     var texture_view: ArcPointer[TextureView]
+alias BindGroupEntry = _c.WGPUBindGroupEntry
+
 @value
-struct BindGroupEntry:
-    """
-    TODO
-    """
-
-    var binding: UInt32
-    var buffer: ArcPointer[Buffer]
-    var offset: UInt64
-    var size: UInt64
-    var sampler: ArcPointer[Sampler]
-    var texture_view: ArcPointer[TextureView]
-
-
 struct BindGroupDescriptor:
     """
     TODO
@@ -101,20 +102,20 @@ struct BindGroupDescriptor:
 
     var label: StringLiteral
 
-    var layout: BindGroupLayout
+    var layout: BindGroupLayoutDescriptor
     var entries: List[BindGroupEntry]
 
 
-@value
-struct BufferBindingLayout:
-    """
-    TODO
-    """
+# @value
+# struct BufferBindingLayout:
+#     """
+#     TODO
+#     """
 
-    var type: BufferBindingType
-    var has_dynamic_offset: Bool
-    var min_binding_size: UInt64
-
+#     var type: BufferBindingType
+#     var has_dynamic_offset: Bool
+#     var min_binding_size: UInt64
+alias BufferBindingLayout = _c.WGPUBufferBindingLayout
 
 @value
 struct SamplerBindingLayout:
@@ -214,19 +215,19 @@ struct StorageTextureBindingLayout:
     var view_dimension: TextureViewDimension
 
 
-@value
-struct BindGroupLayoutEntry:
-    """
-    TODO
-    """
+# @value
+# struct BindGroupLayoutEntry:
+#     """
+#     TODO
+#     """
 
-    var binding: UInt32
-    var visibility: ShaderStage
-    var buffer: BufferBindingLayout
-    var sampler: SamplerBindingLayout
-    var texture: TextureBindingLayout
-    var storage_texture: StorageTextureBindingLayout
-
+#     var binding: UInt32
+#     var visibility: ShaderStage
+#     var buffer: BufferBindingLayout
+#     var sampler: SamplerBindingLayout
+#     var texture: TextureBindingLayout
+#     var storage_texture: StorageTextureBindingLayout
+alias BindGroupLayoutEntry = _c.WGPUBindGroupLayoutEntry
 
 @value
 struct BindGroupLayoutDescriptor:
@@ -246,7 +247,7 @@ struct BufferDescriptor:
 
     var label: StringLiteral
     var usage: BufferUsage
-    var size: UInt64
+    var size: UInt
     var mapped_at_creation: Bool
 
 
@@ -388,14 +389,14 @@ struct VertexBufferLayout[origin: ImmutableOrigin]:
     var step_mode: VertexStepMode
     var attributes: Span[VertexAttribute, origin]
 
-
+@value
 struct PipelineLayoutDescriptor:
     """
     TODO
     """
 
     var label: StringLiteral
-    var bind_group_layouts: List[ArcPointer[BindGroupLayout]]
+    var bind_group_layouts: List[_c.WGPUBindGroupLayout]
 
 
 @value
@@ -676,7 +677,6 @@ struct ColorTargetState:
 
 @value
 struct RenderPipelineDescriptor[
-    lyt: ImmutableOrigin,
     vmod: ImmutableOrigin,
     ventry: ImmutableOrigin,
     buf: ImmutableOrigin,
@@ -690,7 +690,7 @@ struct RenderPipelineDescriptor[
     """
 
     var label: StringLiteral
-    var layout: Optional[Pointer[PipelineLayout, lyt]]
+    var layout: PipelineLayout
     var vertex: VertexState[vmod, ventry, buf, vbuf]
     var primitive: PrimitiveState
     var depth_stencil: Optional[DepthStencilState]

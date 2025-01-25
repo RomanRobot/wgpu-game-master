@@ -1,15 +1,12 @@
-import wgpu
-from wgpu import glfw, VertexAttribute, VertexFormat, Color, VertexBufferLayout, BufferUsage, BufferDescriptor, VertexStepMode
+from wgpu import *
 from sys.info import sizeof
 
-from memory import Span
-from collections import Optional
+from memory import Span, UnsafePointer
+from collections import Optional, InlineArray
 
-@value
-struct Vec3:
-    var x: Float32
-    var y: Float32
-    var z: Float32
+from vec import *
+from mat import *
+from constants import *
 
 @value
 struct MyColor:
@@ -20,8 +17,11 @@ struct MyColor:
 
 @value
 struct MyVertex:
-    var pos: Vec3
+    var pos: Vec4
     var color: MyColor
+
+fn on_uniform_map(status: BufferMapAsyncStatus, user_data: UnsafePointer[NoneType]) -> None:
+    return
 
 def main():
     glfw.init()
@@ -41,29 +41,36 @@ def main():
     surface.configure(
         width=640,
         height=480,
-        usage=wgpu.TextureUsage.render_attachment,
+        usage=TextureUsage.render_attachment,
         format=surface_format,
         device=device,
-        alpha_mode=wgpu.CompositeAlphaMode.auto,
-        present_mode=wgpu.PresentMode.fifo,
+        alpha_mode=CompositeAlphaMode.auto,
+        present_mode=PresentMode.fifo,
     )
 
     shader_code = """
+        struct Uniforms {
+            mvp: mat4x4<f32>,
+        };
+
+        @group(0) @binding(0)
+        var<uniform> uniforms: Uniforms;
+
         struct VertexOutput {
             @builtin(position) position: vec4<f32>,
             @location(1) color: vec4<f32>,
         };
 
         @vertex
-        fn vs_main(@location(0) in_pos: vec3<f32>, @location(1) in_color: vec4<f32>) -> VertexOutput {
-            var p = in_pos;
-            return VertexOutput(vec4<f32>(p, 1.0), in_color);
+        fn vs_main(@location(0) in_pos: vec4<f32>, @location(1) in_color: vec4<f32>) -> VertexOutput {
+            var output: VertexOutput;
+            output.position = in_pos * uniforms.mvp;
+            output.color = in_color;
+            return output;
         }
 
         @fragment
         fn fs_main(@location(1) in_color: vec4<f32>) -> @location(0) vec4<f32> {
-            // Convert color from u32 to f32
-            //let color = vec4<f32>(f32(in_color.x) / 255.0, f32(in_color.y) / 255.0, f32(in_color.z) / 255.0, f32(in_color.w) / 255.0);
             return in_color;
         }
         """
@@ -71,8 +78,8 @@ def main():
     shader_module = device.create_wgsl_shader_module(code=shader_code)
 
     vertex_attributes = List[VertexAttribute](
-        VertexAttribute(format=VertexFormat.float32x3, offset=0, shader_location=0),
-        VertexAttribute(format=VertexFormat.float32x4, offset=sizeof[Vec3](), shader_location=1)
+        VertexAttribute(format=VertexFormat.float32x4, offset=0, shader_location=0),
+        VertexAttribute(format=VertexFormat.float32x4, offset=sizeof[Vec4](), shader_location=1)
     )
 
     vertex_buffer_layout = VertexBufferLayout[StaticConstantOrigin](
@@ -81,99 +88,171 @@ def main():
         attributes=Span[VertexAttribute, StaticConstantOrigin](ptr=vertex_attributes.unsafe_ptr(), length=len(vertex_attributes))
     )
 
-    desc = wgpu.RenderPipelineDescriptor(
-        label="render pipeline",
-        vertex=wgpu.VertexState(
-            entry_point="vs_main",
-            module=shader_module,
-            buffers=List[VertexBufferLayout[StaticConstantOrigin]](vertex_buffer_layout),
-        ),
-        fragment=wgpu.FragmentState(
-            module=shader_module,
-            entry_point="fs_main",
-            targets=List[wgpu.ColorTargetState](
-                wgpu.ColorTargetState(
-                    blend=wgpu.BlendState(
-                        color=wgpu.BlendComponent(
-                            src_factor=wgpu.BlendFactor.src_alpha,
-                            dst_factor=wgpu.BlendFactor.one_minus_src_alpha,
-                            operation=wgpu.BlendOperation.add,
-                        ),
-                        alpha=wgpu.BlendComponent(
-                            src_factor=wgpu.BlendFactor.zero,
-                            dst_factor=wgpu.BlendFactor.one,
-                            operation=wgpu.BlendOperation.add,
-                        ),
-                    ),
-                    format=surface_format,
-                    write_mask=wgpu.ColorWriteMask.all,
-                )
-            ),
-        ),
-        primitive=wgpu.PrimitiveState(
-            topology=wgpu.PrimitiveTopology.triangle_list,
-        ),
-        multisample=wgpu.MultisampleState(),
-        layout=Optional[Pointer[wgpu.PipelineLayout, StaticConstantOrigin]](
-            None
-        ),
-        depth_stencil=None,
+    vertices = InlineArray[MyVertex, 3](
+        MyVertex(Vec4(-0.5, -0.5, 0.0, 1.0), MyColor(1, 0, 0, 1)),
+        MyVertex(Vec4(0.5, -0.5, 0.0, 1.0), MyColor(0, 1, 0, 1)),
+        MyVertex(Vec4(0.0, 0.5, 0.0, 1.0), MyColor(0, 0, 1, 1))
     )
-    pipeline = device.create_render_pipeline(descriptor=desc)
-
-    vertices = List[MyVertex](
-        MyVertex(Vec3(-0.5, -0.5, 0.0), MyColor(1, 0, 0, 1)),
-        MyVertex(Vec3(0.5, -0.5, 0.0), MyColor(0, 1, 0, 1)),
-        MyVertex(Vec3(0.0, 0.5, 0.0), MyColor(0, 0, 1, 1))
-    )
-    vertices_size_bytes = len(vertices) * sizeof[MyVertex]()
     vertex_buffer = device.create_buffer(BufferDescriptor(
-        "vertex buffer",
-        BufferUsage.vertex,
-        vertices_size_bytes,
-        True
+        label="vertex buffer", #StringLiteral
+        usage=BufferUsage.vertex, #BufferUsage
+        size=len(vertices) * sizeof[MyVertex](), #UInt64
+        mapped_at_creation=True #Bool
     ))
-    dst = vertex_buffer.get_mapped_range(0, vertices_size_bytes).bitcast[MyVertex]()
+    dst = vertex_buffer.get_mapped_range().bitcast[MyVertex]()
     for i in range(len(vertices)):
         dst[i] = vertices[i]
     vertex_buffer.unmap()
 
+    model = mat4_identity()
+    view = mat4_translation(0.0, 0.0, -1.0)
+    projection = mat4_perspective(fov=pi*0.5, aspect=480.0/640.0, near=0.1, far=1000.0)
+    mvp = mat4_mul(mat4_mul(projection, view), model)
+    uniform_buffer = device.create_buffer(BufferDescriptor(
+        label="uniform buffer", #StringLiteral
+        usage=BufferUsage.uniform | BufferUsage.copy_dst, #BufferUsage
+        size=sizeof[Mat4](), #UInt64
+        mapped_at_creation=True #Bool
+    ))
+    udst = uniform_buffer.get_mapped_range(0, sizeof[Mat4]()).bitcast[Mat4]()
+    udst[] = mvp
+    uniform_buffer.unmap()
+
+    bind_groups, bind_group_layouts = device.create_bind_groups(List[BindGroupDescriptor](BindGroupDescriptor(
+        label="bind group",
+        layout=BindGroupLayoutDescriptor(
+            label="bind group layout",
+            entries=List[BindGroupLayoutEntry](BindGroupLayoutEntry(
+                binding=0, #UInt32
+                visibility=ShaderStage.vertex, #ShaderStage
+                buffer=BufferBindingLayout(
+                    type=BufferBindingType.uniform, #BufferBindingType
+                    has_dynamic_offset=False, #Bool
+                    min_binding_size=sizeof[Mat4](), #UInt64
+                ), #BufferBindingLayout
+            ))
+        ), #BindGroupLayoutDescriptor
+        entries=List[BindGroupEntry](BindGroupEntry(
+            binding=0, #UInt32
+            buffer=uniform_buffer._handle, #UnsafePointer[_BufferImpl]
+            offset=0, #UInt64
+            size=sizeof[Mat4](), #UInt64
+        )), #List[BindGroupEntry]
+    )))
+
+    # TODO: Figure out how to ergonomically pass these handles like BindGroupLayout around.
+    # ArcPointer is nice but not nullable.
+    # Optional[ArcPointer] maybe?
+    # device create functions could return ArcPointers that handle release.
+    # cffi functions can undig raw, unsafe ptrs
+    # No more copying of arrays in interface functions...
+    # The thing in memory should be the actual thing, not a description used to build on demand.
+    # You can have fancy CRUD interfaces.
+
+    pipeline_layout = device.create_pipeline_layout(PipelineLayoutDescriptor(
+        label="pipeline layout", # StringLiteral
+        bind_group_layouts=bind_group_layouts # List[ArcPointer[BindGroupLayout]]
+    ))
+    pipeline = device.create_render_pipeline(RenderPipelineDescriptor(
+        label="render pipeline",
+        vertex=VertexState(
+            entry_point="vs_main",
+            module=shader_module,
+            buffers=List[VertexBufferLayout[StaticConstantOrigin]](vertex_buffer_layout),
+        ),
+        fragment=FragmentState(
+            module=shader_module,
+            entry_point="fs_main",
+            targets=List[ColorTargetState](
+                ColorTargetState(
+                    blend=BlendState(
+                        color=BlendComponent(
+                            src_factor=BlendFactor.src_alpha,
+                            dst_factor=BlendFactor.one_minus_src_alpha,
+                            operation=BlendOperation.add,
+                        ),
+                        alpha=BlendComponent(
+                            src_factor=BlendFactor.zero,
+                            dst_factor=BlendFactor.one,
+                            operation=BlendOperation.add,
+                        ),
+                    ),
+                    format=surface_format,
+                    write_mask=ColorWriteMask.all,
+                )
+            ),
+        ),
+        primitive=PrimitiveState(
+            topology=PrimitiveTopology.triangle_list,
+        ),
+        multisample=MultisampleState(),
+        layout=pipeline_layout,
+        depth_stencil=None,
+    ))
+
+    var tri_angle: Float32 = 0.0
     while not window.should_close():
         glfw.poll_events()
         with surface.get_current_texture() as surface_tex:
             if (
                 surface_tex.status
-                != wgpu.SurfaceGetCurrentTextureStatus.success
+                != SurfaceGetCurrentTextureStatus.success
             ):
                 raise Error("failed to get surface tex")
             target_view = surface_tex.texture[].create_view(
                 format=surface_tex.texture[].get_format(),
-                dimension=wgpu.TextureViewDimension.d2,
+                dimension=TextureViewDimension.d2,
                 base_mip_level=0,
                 mip_level_count=1,
                 base_array_layer=0,
                 array_layer_count=1,
-                aspect=wgpu.TextureAspect.all,
+                aspect=TextureAspect.all,
             )
-            encoder = device.create_command_encoder()
-            color_attachments = List[wgpu.RenderPassColorAttachment](
-                wgpu.RenderPassColorAttachment(
+            color_attachments = List[RenderPassColorAttachment](
+                RenderPassColorAttachment(
                     view=target_view,
-                    load_op=wgpu.LoadOp.clear,
-                    store_op=wgpu.StoreOp.store,
-                    clear_value=wgpu.Color(0.9, 0.1, 0.2, 1.0),
+                    load_op=LoadOp.clear,
+                    store_op=StoreOp.store,
+                    clear_value=Color(0.9, 0.1, 0.2, 1.0),
                 )
             )
 
+            # encoder = device.create_command_encoder()
+            # tri_angle += 0.01
+            # model = mat4_rotation_y(tri_angle)
+            # mvp = mat4_mul(mat4_mul(projection, view), model)
+
+            # # Attempt 1 (FAILED): Update uniform buffer
+            # # uniform_buffer.map_async(MapMode.write, on_uniform_map, UnsafePointer[NoneType]())
+            # # udst = uniform_buffer.get_mapped_range(0, sizeof[Mat4]()).bitcast[Mat4]()
+            # # udst[] = mvp
+            # # uniform_buffer.unmap()
+
+            # # Attempt 2 (FAILED): Copy uniform buffer
+            # uniform_buffer_src = device.create_buffer(BufferDescriptor(
+            #     label="uniform buffer", #StringLiteral
+            #     usage=BufferUsage.uniform | BufferUsage.copy_src, #BufferUsage
+            #     size=sizeof[Mat4](), #UInt64
+            #     mapped_at_creation=True #Bool
+            # ))
+            # udst = uniform_buffer_src.get_mapped_range(0, sizeof[Mat4]()).bitcast[Mat4]()
+            # udst[] = mvp
+            # uniform_buffer_src.unmap()
+            # encoder.copy_buffer_to_buffer(uniform_buffer_src, 0, uniform_buffer, 0, sizeof[Mat4]())
+
+            # # Attempt 3 (TODO): Push constants
+
+            # queue.submit(encoder.finish())
+
+            encoder = device.create_command_encoder()
             rp = encoder.begin_render_pass(color_attachments=color_attachments)
             rp.set_pipeline(pipeline)
-            rp.set_vertex_buffer(0, 0, vertex_buffer.get_size(), vertex_buffer)
+            rp.set_vertex_buffer(0, vertex_buffer)
+            rp.set_bind_group(0, 0, UnsafePointer[UInt32](), bind_groups[0])
             rp.draw(3, 1, 0, 0)
             rp.end()
 
-            command = encoder.finish()
-
-            queue.submit(command)
+            queue.submit(encoder.finish())
             surface.present()
 
     glfw.terminate()
