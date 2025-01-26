@@ -1425,21 +1425,40 @@ struct Queue:
 #     ]("wgpuQueueOnSubmittedWorkDone")(handle, callback, user_data)
 
 
-# fn queue_write_buffer(
-#     handle: WGPUQueue,
-#     buffer: WGPUBuffer,
-#     buffer_offset: UInt64,
-#     data: UnsafePointer[NoneType],
-#     size: UInt,
-# ) -> None:
-#     """
-#     TODO
-#     """
-#     return _wgpu.get_function[
-#         fn (
-#             WGPUQueue, WGPUBuffer, UInt64, UnsafePointer[NoneType], UInt
-#         ) -> None
-#     ]("wgpuQueueWriteBuffer")(handle, buffer, buffer_offset, data, size)
+    fn write_buffer(
+        self,
+        buffer: Buffer,
+        data: UnsafePointer[NoneType]
+    ) -> None:
+        """
+        TODO
+        """
+        _c.queue_write_buffer(
+            self._handle,
+            buffer._handle,
+            0,
+            data,
+            buffer.size
+        )
+    
+    
+    fn write_buffer(
+        self,
+        buffer: Buffer,
+        buffer_offset: UInt64,
+        data: UnsafePointer[NoneType],
+        size: UInt
+    ) -> None:
+        """
+        TODO
+        """
+        _c.queue_write_buffer(
+            self._handle,
+            buffer._handle,
+            buffer_offset,
+            data,
+            size
+        )
 
 
 # fn queue_write_texture(

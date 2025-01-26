@@ -217,32 +217,15 @@ def main():
                 )
             )
 
-            # encoder = device.create_command_encoder()
-            # tri_angle += 0.01
-            # model = mat4_rotation_y(tri_angle)
-            # mvp = mat4_mul(mat4_mul(projection, view), model)
+            tri_angle += 0.01
+            model = mat4_rotation_y(tri_angle)
+            mvp = mat4_mul(mat4_mul(projection, view), model)
 
-            # # Attempt 1 (FAILED): Update uniform buffer
-            # # uniform_buffer.map_async(MapMode.write, on_uniform_map, UnsafePointer[NoneType]())
-            # # udst = uniform_buffer.get_mapped_range(0, sizeof[Mat4]()).bitcast[Mat4]()
-            # # udst[] = mvp
-            # # uniform_buffer.unmap()
-
-            # # Attempt 2 (FAILED): Copy uniform buffer
-            # uniform_buffer_src = device.create_buffer(BufferDescriptor(
-            #     label="uniform buffer", #StringLiteral
-            #     usage=BufferUsage.uniform | BufferUsage.copy_src, #BufferUsage
-            #     size=sizeof[Mat4](), #UInt64
-            #     mapped_at_creation=True #Bool
-            # ))
-            # udst = uniform_buffer_src.get_mapped_range(0, sizeof[Mat4]()).bitcast[Mat4]()
-            # udst[] = mvp
-            # uniform_buffer_src.unmap()
-            # encoder.copy_buffer_to_buffer(uniform_buffer_src, 0, uniform_buffer, 0, sizeof[Mat4]())
-
-            # # Attempt 3 (TODO): Push constants
-
-            # queue.submit(encoder.finish())
+            # TODO: Do this in a less horrible way.
+            var dst = InlineArray[Float32, 16](0)
+            for i in range(16):
+                dst[i] = mvp[i]
+            queue.write_buffer(uniform_buffer, dst.unsafe_ptr().bitcast[NoneType]())
 
             encoder = device.create_command_encoder()
             rp = encoder.begin_render_pass(color_attachments=color_attachments)
