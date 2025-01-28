@@ -3,10 +3,11 @@ from sys.info import sizeof
 
 from memory import Span, UnsafePointer
 from collections import Optional, InlineArray
+from math import pi
 
-from vec import *
-from mat import *
-from constants import *
+from mat import Mat4
+
+alias Vec4 = SIMD[DType.float32, 4]
 
 @value
 struct MyColor:
@@ -20,12 +21,11 @@ struct MyVertex:
     var pos: Vec4
     var color: MyColor
 
-fn on_uniform_map(status: BufferMapAsyncStatus, user_data: UnsafePointer[NoneType]) -> None:
-    return
-
 def main():
     glfw.init()
-    window = glfw.Window(640, 480, "Hello, WebGPU")
+    window_width = 640
+    window_height = 480
+    window = glfw.Window(window_width, window_height, "Hello, WebGPU")
 
     instance = wgpu.Instance()
     surface = instance.create_surface(window)
@@ -39,8 +39,8 @@ def main():
     surface_capabilies = surface.get_capabilities(adapter)
     surface_format = surface_capabilies.formats()[0]
     surface.configure(
-        width=640,
-        height=480,
+        width=window_width,
+        height=window_height,
         usage=TextureUsage.render_attachment,
         format=surface_format,
         device=device,
@@ -104,18 +104,19 @@ def main():
         dst[i] = vertices[i]
     vertex_buffer.unmap()
 
-    model = mat4_identity()
-    view = mat4_translation(0.0, 0.0, -1.0)
-    projection = mat4_perspective(fov=pi*0.5, aspect=480.0/640.0, near=0.1, far=1000.0)
-    mvp = mat4_mul(mat4_mul(projection, view), model)
+    model = Mat4.identity()
+    view = Mat4.translation(0.0, 0.0, -1.0)
+    projection = Mat4.perspective(fov=pi*0.5, aspect_width=window_height, aspect_height=window_height, near=0.1, far=1000.0)
+    view_projection = view * projection
+    mvp = model * view_projection
     uniform_buffer = device.create_buffer(BufferDescriptor(
         label="uniform buffer", #StringLiteral
         usage=BufferUsage.uniform | BufferUsage.copy_dst, #BufferUsage
         size=sizeof[Mat4](), #UInt64
         mapped_at_creation=True #Bool
     ))
-    udst = uniform_buffer.get_mapped_range(0, sizeof[Mat4]()).bitcast[Mat4]()
-    udst[] = mvp
+    uniform_mapped = uniform_buffer.get_mapped_range(0, sizeof[Mat4]()).bitcast[Mat4]()
+    uniform_mapped[] = mvp
     uniform_buffer.unmap()
 
     bind_groups, bind_group_layouts = device.create_bind_groups(List[BindGroupDescriptor](BindGroupDescriptor(
@@ -218,8 +219,8 @@ def main():
             )
 
             tri_angle += 0.01
-            model = mat4_rotation_y(tri_angle)
-            mvp = mat4_mul(mat4_mul(projection, view), model)
+            model = Mat4.rotation_y(tri_angle)
+            mvp = model * view_projection
 
             # TODO: Do this in a less horrible way.
             var dst = InlineArray[Float32, 16](0)
@@ -232,7 +233,7 @@ def main():
             rp.set_pipeline(pipeline)
             rp.set_vertex_buffer(0, vertex_buffer)
             rp.set_bind_group(0, 0, UnsafePointer[UInt32](), bind_groups[0])
-            rp.draw(3, 1, 0, 0)
+            rp.draw(len(vertices), 1, 0, 0)
             rp.end()
 
             queue.submit(encoder.finish())
