@@ -31,5 +31,4 @@ _Note: the C binding generator in `gen_c.py` is currently stale, so running it w
 
 * [Learn WebGPU](https://eliemichel.github.io/LearnWebGPU/) by Élie Michel and contributors.
 * [wgpu-native](https://github.com/gfx-rs/wgpu-native/) (especially the triangle example).
-* [webgpu-headers](https://github.com/webgpu-native/webgpu-headers/) the `webgpu.json` file is the `webgpu.yml` file from here (at the relevant commit for the `wgpu` version), converted to JSON.
 * [zig-objc](https://github.com/mitchellh/zig-objc) by Mitchell Hashimoto for Objective-C bindings.
