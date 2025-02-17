@@ -6,17 +6,6 @@ This repo shows proof of concept bindings to [wgpu-native](https://github.com/gf
 These bindings are not in a state such that they can be used for anything production ready,
 but one can at least reach a hello-triangle stage.
 
-There are two different examples in this repo: a C-style call, and an attempt at higher level RAII bindings.
-They can be run with:
-```sh
-magic run exec_c
-```
-and
-```sh
-magic run exec
-```
-respctively.
-
 _Note: the C binding generator in `gen_c.py` is currently stale, so running it will break things._
 
 ## Limitations
